@@ -12,6 +12,48 @@ String regionLabel(String r, AppLocalizations t) => switch (r) {
       _ => t.regionOther,
     };
 
+IconData regionIcon(String r) => switch (r) {
+      'coastal' => Icons.beach_access,
+      'malnad' => Icons.forest,
+      'kerala' => Icons.water_drop,
+      _ => Icons.landscape,
+    };
+
+class _Welcome extends StatelessWidget {
+  const _Welcome();
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(colors: [scheme.primary, const Color(0xFF1B5E20)]),
+      ),
+      child: Row(children: [
+        Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), shape: BoxShape.circle),
+          child: const Icon(Icons.eco, color: Colors.white, size: 30),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(t.appTitle,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 2),
+            Text(t.disclaimer, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
 /// Market multi-picker grouped by region. Used on first launch and from Settings.
 class MarketPicker extends StatelessWidget {
   final Set<String> selected;
@@ -32,8 +74,13 @@ class MarketPicker extends StatelessWidget {
       children: [
         for (final region in order) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 12, 4, 6),
-            child: Text(regionLabel(region, t), style: Theme.of(context).textTheme.titleSmall),
+            padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
+            child: Row(children: [
+              Icon(regionIcon(region), size: 18, color: Theme.of(context).colorScheme.secondary),
+              const SizedBox(width: 6),
+              Text(regionLabel(region, t),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+            ]),
           ),
           Wrap(spacing: 8, runSpacing: 8, children: [
             for (final m in markets.where((m) => m.region == region))
@@ -71,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final s = AppScope.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.pickMarketsTitle),
+        title: Text(widget.editing ? t.myMarkets : t.pickMarketsTitle),
         actions: [
           if (!widget.editing)
             TextButton(
@@ -81,7 +128,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ],
       ),
       body: Column(children: [
-        Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 0), child: Text(t.pickMarketsHint)),
+        if (!widget.editing) const _Welcome(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: Text(t.pickMarketsHint, style: Theme.of(context).textTheme.bodyMedium),
+        ),
         Expanded(
           child: MarketPicker(
             selected: selected,
@@ -102,7 +153,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeShell()));
               }
             },
-            child: Text(t.continueLabel),
+            child: Text(selected.isEmpty ? t.continueLabel : '${t.continueLabel} (${selected.length})'),
           ),
         ),
       ),

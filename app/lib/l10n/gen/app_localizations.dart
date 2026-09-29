@@ -1018,7 +1018,7 @@ abstract class AppLocalizations {
   /// No description provided for @notAdmin.
   ///
   /// In en, this message translates to:
-  /// **'This account is not an admin. Ask the owner to run tools/set_claim.py, then sign in again.'**
+  /// **'This account is not an admin yet. Run the GitHub workflow “Adike – set user role” (role: admin) for this email, then sign out and sign in again.'**
   String get notAdmin;
 
   /// No description provided for @approved.

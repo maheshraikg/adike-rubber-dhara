@@ -77,7 +77,7 @@ def template_summary(facts: list[dict]) -> dict:
         hm_en = f["hiMarket"].get("en", h["marketId"])
         arrow = ""
         if h.get("changePct") is not None:
-            arrow = f" ({'▲' if h['changePct'] >= 0 else '▼'}{abs(h['changePct']):.1f}%)"
+            arrow = f" ({h['changePct']:+.1f}%)"
         kn.append(f"{CROP_KN[f['crop']]} {f['kn']}: {hm_kn} ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ಗರಿಷ್ಠ ಸರಾಸರಿ {inr(h['modal'])} "
                   f"{UNIT_KN[f['crop']]}{arrow}; {f['markets']} ಮಾರುಕಟ್ಟೆಗಳ ಧಾರಣೆ ಲಭ್ಯ.")
         en.append(f"{f['crop'].capitalize()} {f['en']}: highest modal {inr(h['modal'])} "

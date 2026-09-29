@@ -32,6 +32,8 @@ Generated data lives on the **gh-pages** branch: `data/latest.json`, `data/histo
 
 ## Setup, step by step (all free)
 
+> **Start here: [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md)** — click-by-click, about one hour, no computer tools needed. The summary below is for reference.
+
 ### 1. Firebase (Spark plan — never add billing)
 1. <https://console.firebase.google.com> → **Add project** → name `adike-rubber-dhara` → Analytics off.
    Stay on **Spark**. Do not click “Upgrade”.
@@ -78,6 +80,8 @@ Generated data lives on the **gh-pages** branch: `data/latest.json`, `data/histo
    inside a checkout of `gh-pages` at `../../site`, then commit and push that branch.
 
 ### 5. Make yourself admin
+Easiest: GitHub → Actions → **Adike – set user role** → email + `admin` → Run. Or locally:
+
 1. Build/run the app (or open `/admin/` after step 6) and **sign in with Google** once.
 2. ```sh
    cd pipeline && pip install -r requirements.txt

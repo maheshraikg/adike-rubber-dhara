@@ -13,7 +13,7 @@ class AppLocalizationsKn extends AppLocalizations {
   String get appTitle => 'ಅಡಿಕೆ–ರಬ್ಬರ್ ಧಾರಣೆ';
 
   @override
-  String get navToday => 'ಇಂದಿನ ಧಾರಣೆ';
+  String get navToday => 'ಇಂದು';
 
   @override
   String get navCompare => 'ಹೋಲಿಕೆ';
@@ -502,7 +502,7 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get notAdmin =>
-      'ಈ ಖಾತೆ ನಿರ್ವಾಹಕ ಅಲ್ಲ. ಮಾಲೀಕರು tools/set_claim.py ಚಲಾಯಿಸಬೇಕು, ನಂತರ ಮತ್ತೆ ಲಾಗಿನ್ ಆಗಿ.';
+      'ಈ ಖಾತೆ ಇನ್ನೂ ನಿರ್ವಾಹಕ ಅಲ್ಲ. GitHub ನಲ್ಲಿ “Adike – set user role” (role: admin) ವರ್ಕ್‌ಫ್ಲೋ ಚಲಾಯಿಸಿ, ನಂತರ ಲಾಗ್ ಔಟ್ ಮಾಡಿ ಮತ್ತೆ ಲಾಗಿನ್ ಆಗಿ.';
 
   @override
   String get approved => 'ಅನುಮೋದಿತ';

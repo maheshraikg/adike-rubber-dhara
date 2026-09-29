@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../../models/models.dart';
 import '../app_state.dart';
+import '../widgets/badges.dart';
 import '../widgets/format.dart';
 
 /// Rows for the share card: favourite markets (or all if none), best source per market+variety.
@@ -106,7 +107,7 @@ class RateCard extends StatelessWidget {
               ),
               Text(inr(r.modal), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black)),
               const SizedBox(width: 6),
-              Text(r.trust == Trust.official ? '🟢' : (r.trust == Trust.partner ? '🔵' : '🟡')),
+              TrustDot(r.trust, size: 10),
             ]),
           ),
       ]);
@@ -121,7 +122,7 @@ class RateCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Text('🌰', style: TextStyle(fontSize: 24)),
+          const Icon(Icons.eco, color: green, size: 26),
           const SizedBox(width: 8),
           Expanded(
             child: Text(t.appTitle, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: green)),
@@ -132,7 +133,14 @@ class RateCard extends StatelessWidget {
         section('arecanut'),
         section('rubber'),
         const Divider(),
-        Text('🟢 ${t.badgeOfficial}  🔵 ${t.badgePartner}  🟡 ${t.badgeTrader}', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+        Wrap(spacing: 12, children: [
+          for (final tr in Trust.values)
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              TrustDot(tr),
+              const SizedBox(width: 4),
+              Text(trustLabel(tr, t), style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            ]),
+        ]),
         Text(t.disclaimer, style: const TextStyle(fontSize: 11, color: Colors.black54)),
       ]),
     );

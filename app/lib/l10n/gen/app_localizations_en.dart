@@ -505,7 +505,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notAdmin =>
-      'This account is not an admin. Ask the owner to run tools/set_claim.py, then sign in again.';
+      'This account is not an admin yet. Run the GitHub workflow “Adike – set user role” (role: admin) for this email, then sign out and sign in again.';
 
   @override
   String get approved => 'Approved';
