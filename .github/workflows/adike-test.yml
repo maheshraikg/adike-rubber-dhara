@@ -1,0 +1,70 @@
+name: Adike – tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    name: Pipeline (pytest + ruff)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./pipeline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: ./pipeline/requirements.txt
+      - run: pip install -r requirements.txt ruff
+      - run: ruff check .
+      - run: pytest
+
+  rules:
+    name: Firestore rules (emulator)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./firestore-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ./firestore-tests/package-lock.json
+      - run: npm ci
+      - run: npx firebase emulators:exec --only firestore --project demo-adike --config ../firebase.json "npm test"
+
+  flutter:
+    name: Flutter (analyze + test + debug APK)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build apk --debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: adike-dhara-debug-apk
+          path: ./app/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14

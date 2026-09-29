@@ -1,0 +1,108 @@
+[
+ {
+  "id": "datagov_mandi",
+  "type": "official",
+  "kind": "api",
+  "enabled": true,
+  "crops": [
+   "arecanut",
+   "rubber"
+  ],
+  "name_en": "AGMARKNET via data.gov.in (APMC mandi prices)",
+  "name_kn": "ಎಪಿಎಂಸಿ ಮಂಡಿ ಧಾರಣೆ (data.gov.in)",
+  "url": "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
+  "verified": false
+ },
+ {
+  "id": "rubberboard_daily",
+  "type": "official",
+  "kind": "html",
+  "enabled": false,
+  "crops": [
+   "rubber"
+  ],
+  "name_en": "Rubber Board – daily rubber prices",
+  "name_kn": "ರಬ್ಬರ್ ಮಂಡಳಿ – ದೈನಂದಿನ ಧಾರಣೆ",
+  "url": "https://rubberboard.gov.in/public",
+  "defaultMarketId": "kottayam",
+  "verified": false,
+  "note": "Enable after running the probe workflow and confirming the page URL."
+ },
+ {
+  "id": "agmarknet_report",
+  "type": "official",
+  "kind": "html",
+  "enabled": false,
+  "crops": [
+   "arecanut"
+  ],
+  "name_en": "Agmarknet date-wise report",
+  "name_kn": "ಅಗ್ಮಾರ್ಕ್‌ನೆಟ್ ದಿನವಾರು ವರದಿ",
+  "url": "https://agmarknet.gov.in/",
+  "verified": false,
+  "note": "Fallback only; enable after confirming the report URL with the probe workflow."
+ },
+ {
+  "id": "krishimaratavahini",
+  "type": "official",
+  "kind": "html",
+  "enabled": false,
+  "crops": [
+   "arecanut"
+  ],
+  "name_en": "Krishi Marata Vahini (Karnataka APMC)",
+  "name_kn": "ಕೃಷಿ ಮಾರಾಟ ವಾಹಿನಿ",
+  "url": "https://krishimaratavahini.kar.nic.in/",
+  "verified": false,
+  "note": "Enable after confirming the daily arrivals/prices report URL with the probe workflow."
+ },
+ {
+  "id": "campco",
+  "type": "partner",
+  "kind": "html",
+  "enabled": false,
+  "permissionConfirmed": false,
+  "crops": [
+   "arecanut",
+   "rubber"
+  ],
+  "name_en": "CAMPCO",
+  "name_kn": "ಕ್ಯಾಂಪ್ಕೊ",
+  "url": "https://www.campco.org/",
+  "defaultMarketId": "mangaluru",
+  "verified": false,
+  "note": "Co-operative. Needs written permission before enabling (set permissionConfirmed: true)."
+ },
+ {
+  "id": "tss_sirsi",
+  "type": "partner",
+  "kind": "html",
+  "enabled": false,
+  "permissionConfirmed": false,
+  "crops": [
+   "arecanut"
+  ],
+  "name_en": "TSS Sirsi",
+  "name_kn": "ಟಿಎಸ್‌ಎಸ್ ಶಿರಸಿ",
+  "url": "https://www.tssindia.in/",
+  "defaultMarketId": "sirsi",
+  "verified": false,
+  "note": "Co-operative. Needs written permission before enabling."
+ },
+ {
+  "id": "mamcos",
+  "type": "partner",
+  "kind": "html",
+  "enabled": false,
+  "permissionConfirmed": false,
+  "crops": [
+   "arecanut"
+  ],
+  "name_en": "MAMCOS Shivamogga",
+  "name_kn": "ಮ್ಯಾಮ್ಕೋಸ್ ಶಿವಮೊಗ್ಗ",
+  "url": "https://www.mamcos.in/",
+  "defaultMarketId": "shivamogga",
+  "verified": false,
+  "note": "Co-operative. Needs written permission before enabling. Partner submissions (app) also work."
+ }
+]

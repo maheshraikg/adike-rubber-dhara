@@ -1,0 +1,38 @@
+# Sends price alerts and the evening summary (FCM HTTP v1, free) after each collection.
+name: Adike – alerts
+
+on:
+  workflow_run:
+    workflows: ['Adike – collect prices']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  APP_DIR: .
+  DATA_BRANCH: gh-pages
+
+jobs:
+  alerts:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DATA_BRANCH }}
+          path: site
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: ${{ env.APP_DIR }}/pipeline/requirements.txt
+      - run: pip install -r "$APP_DIR/pipeline/requirements.txt"
+      - name: Evaluate alerts and send notifications
+        working-directory: ${{ env.APP_DIR }}/pipeline
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python -m adike_pipeline.alerts --site "$GITHUB_WORKSPACE/site"

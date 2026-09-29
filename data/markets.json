@@ -1,0 +1,451 @@
+[
+ {
+  "id": "shivamogga",
+  "en": "Shivamogga",
+  "kn": "ಶಿವಮೊಗ್ಗ",
+  "district": "Shivamogga",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.93,
+  "lon": 75.57,
+  "aliases": [
+   "shimoga",
+   "shivamogga",
+   "shimoga apmc"
+  ]
+ },
+ {
+  "id": "sagar",
+  "en": "Sagar",
+  "kn": "ಸಾಗರ",
+  "district": "Shivamogga",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 14.17,
+  "lon": 75.03,
+  "aliases": [
+   "sagar",
+   "sagara"
+  ]
+ },
+ {
+  "id": "tirthahalli",
+  "en": "Tirthahalli",
+  "kn": "ತೀರ್ಥಹಳ್ಳಿ",
+  "district": "Shivamogga",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.69,
+  "lon": 75.24,
+  "aliases": [
+   "tirthahalli",
+   "thirthahalli",
+   "theerthahalli"
+  ]
+ },
+ {
+  "id": "hosanagara",
+  "en": "Hosanagara",
+  "kn": "ಹೊಸನಗರ",
+  "district": "Shivamogga",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.91,
+  "lon": 75.07,
+  "aliases": [
+   "hosanagara",
+   "hosanagar"
+  ]
+ },
+ {
+  "id": "shikaripura",
+  "en": "Shikaripura",
+  "kn": "ಶಿಕಾರಿಪುರ",
+  "district": "Shivamogga",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 14.27,
+  "lon": 75.35,
+  "aliases": [
+   "shikaripura",
+   "shikaripur"
+  ]
+ },
+ {
+  "id": "bhadravathi",
+  "en": "Bhadravathi",
+  "kn": "ಭದ್ರಾವತಿ",
+  "district": "Shivamogga",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.84,
+  "lon": 75.7,
+  "aliases": [
+   "bhadravathi",
+   "bhadravati"
+  ]
+ },
+ {
+  "id": "channagiri",
+  "en": "Channagiri",
+  "kn": "ಚನ್ನಗಿರಿ",
+  "district": "Davanagere",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 14.03,
+  "lon": 75.93,
+  "aliases": [
+   "channagiri",
+   "chennagiri"
+  ]
+ },
+ {
+  "id": "davanagere",
+  "en": "Davanagere",
+  "kn": "ದಾವಣಗೆರೆ",
+  "district": "Davanagere",
+  "state": "Karnataka",
+  "region": "other",
+  "lat": 14.46,
+  "lon": 75.92,
+  "aliases": [
+   "davanagere",
+   "davangere"
+  ]
+ },
+ {
+  "id": "chitradurga",
+  "en": "Chitradurga",
+  "kn": "ಚಿತ್ರದುರ್ಗ",
+  "district": "Chitradurga",
+  "state": "Karnataka",
+  "region": "other",
+  "lat": 14.23,
+  "lon": 76.4,
+  "aliases": [
+   "chitradurga"
+  ]
+ },
+ {
+  "id": "holalkere",
+  "en": "Holalkere",
+  "kn": "ಹೊಳಲ್ಕೆರೆ",
+  "district": "Chitradurga",
+  "state": "Karnataka",
+  "region": "other",
+  "lat": 14.04,
+  "lon": 76.19,
+  "aliases": [
+   "holalkere"
+  ]
+ },
+ {
+  "id": "chikkamagaluru",
+  "en": "Chikkamagaluru",
+  "kn": "ಚಿಕ್ಕಮಗಳೂರು",
+  "district": "Chikkamagaluru",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.32,
+  "lon": 75.77,
+  "aliases": [
+   "chikkamagaluru",
+   "chikmagalur",
+   "chickmagalur"
+  ]
+ },
+ {
+  "id": "koppa",
+  "en": "Koppa",
+  "kn": "ಕೊಪ್ಪ",
+  "district": "Chikkamagaluru",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.53,
+  "lon": 75.36,
+  "aliases": [
+   "koppa"
+  ]
+ },
+ {
+  "id": "sringeri",
+  "en": "Sringeri",
+  "kn": "ಶೃಂಗೇರಿ",
+  "district": "Chikkamagaluru",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.42,
+  "lon": 75.25,
+  "aliases": [
+   "sringeri",
+   "shringeri"
+  ]
+ },
+ {
+  "id": "nr_pura",
+  "en": "N.R. Pura",
+  "kn": "ನ.ರಾ. ಪುರ",
+  "district": "Chikkamagaluru",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 13.61,
+  "lon": 75.51,
+  "aliases": [
+   "n.r.pura",
+   "nr pura",
+   "narasimharajapura"
+  ]
+ },
+ {
+  "id": "tumakuru",
+  "en": "Tumakuru",
+  "kn": "ತುಮಕೂರು",
+  "district": "Tumakuru",
+  "state": "Karnataka",
+  "region": "other",
+  "lat": 13.34,
+  "lon": 77.1,
+  "aliases": [
+   "tumkur",
+   "tumakuru"
+  ]
+ },
+ {
+  "id": "tiptur",
+  "en": "Tiptur",
+  "kn": "ತಿಪಟೂರು",
+  "district": "Tumakuru",
+  "state": "Karnataka",
+  "region": "other",
+  "lat": 13.26,
+  "lon": 76.48,
+  "aliases": [
+   "tiptur",
+   "tiptoor"
+  ]
+ },
+ {
+  "id": "sirsi",
+  "en": "Sirsi",
+  "kn": "ಶಿರಸಿ",
+  "district": "Uttara Kannada",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 14.62,
+  "lon": 74.84,
+  "aliases": [
+   "sirsi"
+  ]
+ },
+ {
+  "id": "siddapur",
+  "en": "Siddapur",
+  "kn": "ಸಿದ್ದಾಪುರ",
+  "district": "Uttara Kannada",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 14.34,
+  "lon": 74.89,
+  "aliases": [
+   "siddapur",
+   "siddapura"
+  ]
+ },
+ {
+  "id": "yellapur",
+  "en": "Yellapur",
+  "kn": "ಯಲ್ಲಾಪುರ",
+  "district": "Uttara Kannada",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 14.96,
+  "lon": 74.71,
+  "aliases": [
+   "yellapur",
+   "yellapura"
+  ]
+ },
+ {
+  "id": "kumta",
+  "en": "Kumta",
+  "kn": "ಕುಮಟಾ",
+  "district": "Uttara Kannada",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 14.43,
+  "lon": 74.42,
+  "aliases": [
+   "kumta"
+  ]
+ },
+ {
+  "id": "honnavar",
+  "en": "Honnavar",
+  "kn": "ಹೊನ್ನಾವರ",
+  "district": "Uttara Kannada",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 14.28,
+  "lon": 74.44,
+  "aliases": [
+   "honnavar",
+   "honnavara"
+  ]
+ },
+ {
+  "id": "puttur",
+  "en": "Puttur",
+  "kn": "ಪುತ್ತೂರು",
+  "district": "Dakshina Kannada",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 12.76,
+  "lon": 75.2,
+  "aliases": [
+   "puttur",
+   "puttur apmc"
+  ]
+ },
+ {
+  "id": "mangaluru",
+  "en": "Mangaluru",
+  "kn": "ಮಂಗಳೂರು",
+  "district": "Dakshina Kannada",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 12.91,
+  "lon": 74.86,
+  "aliases": [
+   "mangalore",
+   "mangaluru"
+  ]
+ },
+ {
+  "id": "bantwal",
+  "en": "Bantwal",
+  "kn": "ಬಂಟ್ವಾಳ",
+  "district": "Dakshina Kannada",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 12.89,
+  "lon": 75.03,
+  "aliases": [
+   "bantwal",
+   "bantwala",
+   "b.c. road",
+   "bc road"
+  ]
+ },
+ {
+  "id": "belthangady",
+  "en": "Belthangady",
+  "kn": "ಬೆಳ್ತಂಗಡಿ",
+  "district": "Dakshina Kannada",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 12.99,
+  "lon": 75.3,
+  "aliases": [
+   "belthangady",
+   "belthangadi",
+   "beltangadi"
+  ]
+ },
+ {
+  "id": "sullia",
+  "en": "Sullia",
+  "kn": "ಸುಳ್ಯ",
+  "district": "Dakshina Kannada",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 12.56,
+  "lon": 75.39,
+  "aliases": [
+   "sullia",
+   "sulya"
+  ]
+ },
+ {
+  "id": "kundapura",
+  "en": "Kundapura",
+  "kn": "ಕುಂದಾಪುರ",
+  "district": "Udupi",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 13.63,
+  "lon": 74.69,
+  "aliases": [
+   "kundapur",
+   "kundapura"
+  ]
+ },
+ {
+  "id": "udupi",
+  "en": "Udupi",
+  "kn": "ಉಡುಪಿ",
+  "district": "Udupi",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 13.34,
+  "lon": 74.75,
+  "aliases": [
+   "udupi"
+  ]
+ },
+ {
+  "id": "karkala",
+  "en": "Karkala",
+  "kn": "ಕಾರ್ಕಳ",
+  "district": "Udupi",
+  "state": "Karnataka",
+  "region": "coastal",
+  "lat": 13.21,
+  "lon": 74.99,
+  "aliases": [
+   "karkala",
+   "karkal"
+  ]
+ },
+ {
+  "id": "madikeri",
+  "en": "Madikeri",
+  "kn": "ಮಡಿಕೇರಿ",
+  "district": "Kodagu",
+  "state": "Karnataka",
+  "region": "malnad",
+  "lat": 12.42,
+  "lon": 75.74,
+  "aliases": [
+   "madikeri",
+   "mercara"
+  ]
+ },
+ {
+  "id": "kottayam",
+  "en": "Kottayam",
+  "kn": "ಕೊಟ್ಟಾಯಂ",
+  "district": "Kottayam",
+  "state": "Kerala",
+  "region": "kerala",
+  "lat": 9.59,
+  "lon": 76.52,
+  "aliases": [
+   "kottayam"
+  ]
+ },
+ {
+  "id": "kochi",
+  "en": "Kochi",
+  "kn": "ಕೊಚ್ಚಿ",
+  "district": "Ernakulam",
+  "state": "Kerala",
+  "region": "kerala",
+  "lat": 9.93,
+  "lon": 76.27,
+  "aliases": [
+   "kochi",
+   "cochin",
+   "ernakulam"
+  ]
+ }
+]

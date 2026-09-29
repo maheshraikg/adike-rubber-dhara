@@ -1,0 +1,89 @@
+rules_version = '2';
+// Adike–Rubber Dhara. Prices are NOT in Firestore (they are static JSON on GitHub Pages).
+// Firestore holds only alerts, reports, partner submissions and admin data.
+// The pipeline uses the Admin SDK (service account) which bypasses these rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
+    function isPartner() { return signedIn() && request.auth.token.partner == true; }
+    function isGoogleUser() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function d() { return request.resource.data; }
+
+    // Partner rate submissions: text and/or one compressed JPEG (base64, ≤ ~300 KB).
+    match /submissions/{id} {
+      allow create: if isPartner()
+        && d().partnerUid == request.auth.uid
+        && d().sourceId == request.auth.token.sourceId
+        && d().status == 'new'
+        && d().keys().hasOnly(['partnerUid', 'sourceId', 'text', 'imageB64', 'status', 'createdAt'])
+        && (('text' in d()) || ('imageB64' in d()))
+        && (!('text' in d()) || (d().text is string && d().text.size() <= 5000))
+        && (!('imageB64' in d()) || (d().imageB64 is string && d().imageB64.size() <= 420000))
+        && d().createdAt == request.time;
+      allow read: if isAdmin() || (isPartner() && resource.data.partnerUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // Flagged rows waiting for an admin decision.
+    match /review/{key} {
+      allow read, write: if isAdmin();
+    }
+
+    // Validation config, alias maps, etc.
+    match /config/{doc} {
+      allow read, write: if isAdmin();
+    }
+
+    // Pipeline run logs.
+    match /runs/{runId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Partners. Admin manages everything. A Google-signed-in user may file their
+    // own application (approved: false) and read it; only admin can approve.
+    match /partners/{uid} {
+      allow read, write: if isAdmin();
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create: if isGoogleUser() && request.auth.uid == uid
+        && d().approved == false
+        && d().keys().hasOnly(['name', 'phone', 'address', 'marketId', 'note', 'approved', 'createdAt'])
+        && d().name is string && d().name.size() <= 100;
+    }
+
+    // Price alerts (farmers use anonymous auth). Only the owner can see/change them.
+    function validAlert() {
+      return d().uid == request.auth.uid
+        && d().keys().hasOnly(['uid', 'fcmToken', 'crop', 'variety', 'marketId', 'condition',
+                               'value', 'active', 'lastFiredDate', 'createdAt'])
+        && d().crop in ['arecanut', 'rubber']
+        && d().condition in ['above', 'below']
+        && d().value is number && d().value > 0
+        && d().fcmToken is string && d().fcmToken.size() < 4096
+        && d().variety is string && d().marketId is string
+        && d().active is bool;
+    }
+    match /alerts/{id} {
+      allow create: if signedIn() && validAlert();
+      allow read, delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid && validAlert();
+    }
+
+    // "Wrong rate" reports: any signed-in user may create; only admin reads.
+    match /reports/{id} {
+      allow create: if signedIn()
+        && d().uid == request.auth.uid
+        && d().keys().hasOnly(['uid', 'priceKey', 'reason', 'note', 'createdAt'])
+        && d().priceKey is string && d().priceKey.size() < 300
+        && (!('note' in d()) || (d().note is string && d().note.size() <= 500));
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

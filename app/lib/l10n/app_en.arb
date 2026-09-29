@@ -1,0 +1,241 @@
+{
+  "@@locale": "en",
+  "appTitle": "Adike–Rubber Dhara",
+  "navToday": "Today",
+  "navCompare": "Compare",
+  "navCalculator": "Calculator",
+  "navDiary": "Diary",
+  "navMore": "More",
+  "cropArecanut": "Arecanut",
+  "cropRubber": "Rubber",
+  "unitQuintal": "₹/quintal",
+  "unitKg": "₹/kg",
+  "badgeOfficial": "Official",
+  "badgePartner": "Partner",
+  "badgeTrader": "Trader",
+  "modal": "Modal",
+  "minLabel": "Min",
+  "maxLabel": "Max",
+  "lastUpdated": "Last updated: {time}",
+  "@lastUpdated": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineBanner": "Offline — showing saved rates from {time}",
+  "@offlineBanner": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "loadError": "Could not load rates. Check internet and pull to refresh.",
+  "noData": "No rates available",
+  "myMarkets": "My markets",
+  "otherMarkets": "Other markets",
+  "summaryTitle": "Today's summary",
+  "summaryNote": "Auto-written only from published rates. Not advice.",
+  "sampleData": "SAMPLE data — not real prices",
+  "pickMarketsTitle": "Choose your markets",
+  "pickMarketsHint": "Your markets are shown first. You can change them later in Settings.",
+  "continueLabel": "Continue",
+  "regionCoastal": "Coastal",
+  "regionMalnad": "Malnad",
+  "regionOther": "Other Karnataka",
+  "regionKerala": "Kerala",
+  "range7d": "7D",
+  "range1m": "1M",
+  "range6m": "6M",
+  "range1y": "1Y",
+  "seasonCompare": "Same period last year",
+  "thisYear": "This year",
+  "recentDays": "Recent days",
+  "allSources": "All sources",
+  "setAlert": "Set alert",
+  "share": "Share",
+  "reportWrong": "Report wrong rate",
+  "dateLabel": "Date",
+  "noHistory": "No history yet",
+  "compareTitle": "Compare markets",
+  "variety": "Variety",
+  "market": "Market",
+  "alertsTitle": "Price alerts",
+  "alertAbove": "Goes above",
+  "alertBelow": "Falls below",
+  "alertValue": "Price (₹)",
+  "alertCreate": "Create alert",
+  "alertNone": "No alerts yet. Open a rate and tap “Set alert”.",
+  "alertSaved": "Alert saved. You will get a notification once a day at most.",
+  "alertLine": "{variety} · {market}: {condition} {value}",
+  "@alertLine": {
+    "placeholders": {
+      "variety": {
+        "type": "String"
+      },
+      "market": {
+        "type": "String"
+      },
+      "condition": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "needsOnline": "This needs internet and the app's online services.",
+  "notConfigured": "Online services are not configured in this build.",
+  "errorGeneric": "Something went wrong: {error}",
+  "@errorGeneric": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "save": "Save",
+  "retry": "Retry",
+  "calcTitle": "Sale calculator",
+  "quantity": "Quantity",
+  "unitKgShort": "kg",
+  "unitQuintalShort": "quintal",
+  "unitBags": "bags",
+  "bagWeight": "Weight per bag (kg)",
+  "rate": "Rate",
+  "useTodayRate": "Use today's rate",
+  "commissionPct": "Commission %",
+  "hamali": "Hamali (₹)",
+  "transport": "Transport (₹)",
+  "gross": "Gross amount",
+  "deductions": "Deductions",
+  "net": "Net amount",
+  "totalKg": "Total weight: {kg} kg",
+  "@totalKg": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryTitle": "Sales diary",
+  "diaryAdd": "Add sale",
+  "diaryEmpty": "No sales recorded yet.",
+  "diaryBuyer": "Buyer / society",
+  "diaryNote": "Note",
+  "diaryAmount": "Amount received (₹)",
+  "diaryQtyKg": "Quantity (kg)",
+  "seasonTotal": "Season {season} total",
+  "@seasonTotal": {
+    "placeholders": {
+      "season": {
+        "type": "String"
+      }
+    }
+  },
+  "exportCsv": "Export CSV",
+  "diaryPrivate": "Your diary stays only on this phone.",
+  "weatherTitle": "Drying weather",
+  "dryGood": "Good drying day",
+  "dryRisky": "Risky",
+  "dryBad": "Bad drying day",
+  "dryRule": "Daytime 8 am–5 pm. Good: rain < 0.5 mm, humidity < 80%, cloud < 70%. Bad: rain ≥ 2 mm or humidity ≥ 90%. Otherwise risky.",
+  "weatherStats": "Rain {rain} mm · Humidity {hum}% · Cloud {cloud}%",
+  "@weatherStats": {
+    "placeholders": {
+      "rain": {
+        "type": "String"
+      },
+      "hum": {
+        "type": "String"
+      },
+      "cloud": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherAttribution": "Weather data: MET Norway (api.met.no), CC BY 4.0",
+  "weatherPlace": "Place",
+  "today": "Today",
+  "tomorrow": "Tomorrow",
+  "shareCardTitle": "Share card",
+  "shareCardHint": "Shows today's rates for your markets. Share it on WhatsApp.",
+  "shareNow": "Share image",
+  "settingsTitle": "Settings & about",
+  "language": "Language",
+  "notifications": "Notifications",
+  "dailySummaryNotif": "Daily evening summary",
+  "dataSources": "Data sources",
+  "disclaimer": "Rates are indicative only; confirm with the buyer before selling.",
+  "privacyNote": "No login or personal data is needed. Your diary and settings stay on your phone.",
+  "trustScore": "Trust score {score}",
+  "@trustScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "openLink": "Open",
+  "call": "Call",
+  "map": "Map",
+  "timings": "Timings",
+  "address": "Address",
+  "partnerMode": "Partner mode",
+  "adminMode": "Admin",
+  "signInGoogle": "Sign in with Google",
+  "signOut": "Sign out",
+  "partnerIntro": "For co-operative societies and traders who share their daily rates. Farmers do not need to sign in.",
+  "partnerSubmitText": "Type today's rates (market, variety, min, max, modal)",
+  "partnerAddPhoto": "Add photo of rate board",
+  "submit": "Submit",
+  "submitted": "Submitted. It will be checked in the next collection run.",
+  "mySubmissions": "My submissions",
+  "statusNew": "Waiting",
+  "statusProcessed": "Processed",
+  "statusFailed": "Failed",
+  "partnerApply": "Apply to become a partner",
+  "partnerPending": "Your application is waiting for approval. After approval, sign out and sign in again.",
+  "partnerProfile": "Your public profile",
+  "name": "Name of society / shop",
+  "phone": "Business phone",
+  "reportTitle": "What is wrong?",
+  "reportPrice": "Price is wrong",
+  "reportDate": "Old / wrong date",
+  "reportOther": "Other",
+  "reportSent": "Thank you! We will check it.",
+  "changeLabel": "Change",
+  "asOf": "as of {date}",
+  "@asOf": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAlerts": "Price alerts",
+  "adminReview": "Review",
+  "adminPartners": "Partners",
+  "adminConfig": "Config",
+  "adminRuns": "Runs",
+  "adminReports": "Reports",
+  "approve": "Approve",
+  "editApprove": "Edit + approve",
+  "reject": "Reject",
+  "flags": "Flags",
+  "rawExcerpt": "Raw source text",
+  "reviewEmpty": "Nothing to review.",
+  "runNow": "Run collection now (GitHub)",
+  "notAdmin": "This account is not an admin. Ask the owner to run tools/set_claim.py, then sign in again.",
+  "approved": "Approved",
+  "sourceId": "Source id",
+  "type": "Type",
+  "aliasesJson": "Alias maps (JSON)",
+  "savedOk": "Saved",
+  "invalidJson": "Invalid JSON",
+  "shareText": "Today's arecanut & rubber rates — Adike–Rubber Dhara app"
+}

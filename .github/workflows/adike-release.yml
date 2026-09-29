@@ -1,0 +1,102 @@
+# Builds the shareable release APK (and the admin web console to gh-pages/admin).
+# Firebase client config comes from repository *variables* (public identifiers, not secrets).
+# Signing keystore comes from secrets (optional; falls back to debug signing).
+name: Adike – release APK + admin web
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['adike-v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: adike-gh-pages
+  cancel-in-progress: false
+
+env:
+  APP_DIR: .
+  DATA_BRANCH: gh-pages
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: ${{ env.APP_DIR }}/app
+    env:
+      DEFINES: >-
+        --dart-define=FIREBASE_API_KEY=${{ vars.ADIKE_FIREBASE_API_KEY }}
+        --dart-define=FIREBASE_WEB_API_KEY=${{ vars.ADIKE_FIREBASE_WEB_API_KEY }}
+        --dart-define=FIREBASE_PROJECT_ID=${{ vars.ADIKE_FIREBASE_PROJECT_ID }}
+        --dart-define=FIREBASE_SENDER_ID=${{ vars.ADIKE_FIREBASE_SENDER_ID }}
+        --dart-define=FIREBASE_ANDROID_APP_ID=${{ vars.ADIKE_FIREBASE_ANDROID_APP_ID }}
+        --dart-define=FIREBASE_WEB_APP_ID=${{ vars.ADIKE_FIREBASE_WEB_APP_ID }}
+        --dart-define=DATA_BASE_URL=${{ vars.ADIKE_DATA_BASE_URL }}
+        --dart-define=GITHUB_REPO=${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter test
+
+      - name: Release keystore (optional)
+        env:
+          KEYSTORE_B64: ${{ secrets.ADIKE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ADIKE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ADIKE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ADIKE_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > android/app/release.jks
+            printf 'storeFile=release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+              "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
+          else
+            echo "::warning::No ADIKE_KEYSTORE_BASE64 secret: APK will be debug-signed (testing only)."
+          fi
+
+      - name: Build release APK
+        run: flutter build apk --release $DEFINES
+
+      - name: Build admin web
+        run: |
+          base="/${GITHUB_REPOSITORY#*/}/admin/"
+          flutter build web --release --base-href "$base" $DEFINES
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: adike-dhara-release-apk
+          path: ${{ env.APP_DIR }}/app/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Attach APK to a GitHub release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.APP_DIR }}/app/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Publish admin web to gh-pages/admin
+        working-directory: ${{ github.workspace }}
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          url="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads "$url" "$DATA_BRANCH" >/dev/null; then
+            git clone --depth 1 --branch "$DATA_BRANCH" "$url" site
+          else
+            mkdir site && git -C site init -b "$DATA_BRANCH" && git -C site remote add origin "$url"
+          fi
+          rm -rf site/admin && cp -r "$APP_DIR/app/build/web" site/admin && touch site/.nojekyll
+          cd site && git add -A
+          git diff --cached --quiet && exit 0
+          git -c user.name="adike-bot" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "admin web: ${GITHUB_SHA::7}"
+          git push origin "HEAD:$DATA_BRANCH"

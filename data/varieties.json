@@ -1,0 +1,273 @@
+[
+ {
+  "id": "rashi",
+  "crop": "arecanut",
+  "en": "Rashi",
+  "kn": "ರಾಶಿ",
+  "aliases": [
+   "rashi",
+   "rasi",
+   "ರಾಶಿ",
+   "rashi idi",
+   "ರಾಶಿ ಇಡಿ"
+  ]
+ },
+ {
+  "id": "bette",
+  "crop": "arecanut",
+  "en": "Bette",
+  "kn": "ಬೆಟ್ಟೆ",
+  "aliases": [
+   "bette",
+   "bettee",
+   "ಬೆಟ್ಟೆ"
+  ]
+ },
+ {
+  "id": "saraku",
+  "crop": "arecanut",
+  "en": "Saraku",
+  "kn": "ಸರಕು",
+  "aliases": [
+   "saraku",
+   "sarakku",
+   "ಸರಕು"
+  ]
+ },
+ {
+  "id": "gorabalu",
+  "crop": "arecanut",
+  "en": "Gorabalu",
+  "kn": "ಗೊರಬಲು",
+  "aliases": [
+   "gorabalu",
+   "gorabal",
+   "ಗೊರಬಲು"
+  ]
+ },
+ {
+  "id": "api",
+  "crop": "arecanut",
+  "en": "Api",
+  "kn": "ಆಪಿ",
+  "aliases": [
+   "api",
+   "ಆಪಿ"
+  ]
+ },
+ {
+  "id": "kempugotu",
+  "crop": "arecanut",
+  "en": "Kempugotu",
+  "kn": "ಕೆಂಪುಗೋಟು",
+  "aliases": [
+   "kempugotu",
+   "kempu gotu",
+   "ಕೆಂಪುಗೋಟು"
+  ]
+ },
+ {
+  "id": "bilegotu",
+  "crop": "arecanut",
+  "en": "Bilegotu",
+  "kn": "ಬಿಳೆಗೋಟು",
+  "aliases": [
+   "bilegotu",
+   "bile gotu",
+   "ಬಿಳೆಗೋಟು"
+  ]
+ },
+ {
+  "id": "tattibette",
+  "crop": "arecanut",
+  "en": "Tattibette",
+  "kn": "ತಟ್ಟಿಬೆಟ್ಟೆ",
+  "aliases": [
+   "tattibette",
+   "tattibettee",
+   "ತಟ್ಟಿಬೆಟ್ಟೆ"
+  ]
+ },
+ {
+  "id": "chali_new",
+  "crop": "arecanut",
+  "en": "New Chali",
+  "kn": "ಹೊಸ ಚಾಲಿ",
+  "aliases": [
+   "new chali",
+   "chali new",
+   "hosa chali",
+   "ಹೊಸ ಚಾಲಿ",
+   "chali",
+   "ಚಾಲಿ",
+   "new variety"
+  ]
+ },
+ {
+  "id": "chali_old",
+  "crop": "arecanut",
+  "en": "Old Chali",
+  "kn": "ಹಳೆ ಚಾಲಿ",
+  "aliases": [
+   "old chali",
+   "chali old",
+   "hale chali",
+   "ಹಳೆ ಚಾಲಿ",
+   "ಹಳೇ ಚಾಲಿ"
+  ]
+ },
+ {
+  "id": "double_chol",
+  "crop": "arecanut",
+  "en": "Double Chol",
+  "kn": "ಡಬಲ್ ಚೋಲ್",
+  "aliases": [
+   "double chol",
+   "double chal",
+   "ಡಬಲ್ ಚೋಲ್"
+  ]
+ },
+ {
+  "id": "coca",
+  "crop": "arecanut",
+  "en": "Coca",
+  "kn": "ಕೋಕಾ",
+  "aliases": [
+   "coca",
+   "koka",
+   "cqca",
+   "ಕೋಕಾ",
+   "ಕೋಕ"
+  ]
+ },
+ {
+  "id": "patora",
+  "crop": "arecanut",
+  "en": "Patora",
+  "kn": "ಪಟೋರಾ",
+  "aliases": [
+   "patora",
+   "pattora",
+   "ಪಟೋರಾ"
+  ]
+ },
+ {
+  "id": "ulli",
+  "crop": "arecanut",
+  "en": "Ulli",
+  "kn": "ಉಳ್ಳಿ",
+  "aliases": [
+   "ulli",
+   "ಉಳ್ಳಿ"
+  ]
+ },
+ {
+  "id": "karigotu",
+  "crop": "arecanut",
+  "en": "Karigotu",
+  "kn": "ಕರಿಗೋಟು",
+  "aliases": [
+   "karigotu",
+   "kari gotu",
+   "ಕರಿಗೋಟು"
+  ]
+ },
+ {
+  "id": "other",
+  "crop": "arecanut",
+  "en": "Other",
+  "kn": "ಇತರೆ",
+  "aliases": [
+   "other",
+   "others",
+   "ಇತರೆ"
+  ]
+ },
+ {
+  "id": "rss4",
+  "crop": "rubber",
+  "en": "RSS-4",
+  "kn": "ಆರ್‌ಎಸ್‌ಎಸ್-4",
+  "aliases": [
+   "rss-4",
+   "rss 4",
+   "rss4",
+   "rss iv",
+   "ಆರ್‌ಎಸ್‌ಎಸ್-4",
+   "ಆರ್ಎಸ್ಎಸ್ 4"
+  ]
+ },
+ {
+  "id": "rss5",
+  "crop": "rubber",
+  "en": "RSS-5",
+  "kn": "ಆರ್‌ಎಸ್‌ಎಸ್-5",
+  "aliases": [
+   "rss-5",
+   "rss 5",
+   "rss5",
+   "rss v",
+   "ಆರ್‌ಎಸ್‌ಎಸ್-5",
+   "ಆರ್ಎಸ್ಎಸ್ 5"
+  ]
+ },
+ {
+  "id": "isnr20",
+  "crop": "rubber",
+  "en": "ISNR-20",
+  "kn": "ಐಎಸ್‌ಎನ್‌ಆರ್-20",
+  "aliases": [
+   "isnr-20",
+   "isnr 20",
+   "isnr20"
+  ]
+ },
+ {
+  "id": "latex60",
+  "crop": "rubber",
+  "en": "Latex (60% DRC)",
+  "kn": "ಲ್ಯಾಟೆಕ್ಸ್ (60%)",
+  "aliases": [
+   "latex",
+   "latex 60%",
+   "latex (60% drc)",
+   "60% latex",
+   "ಲ್ಯಾಟೆಕ್ಸ್"
+  ]
+ },
+ {
+  "id": "ungraded",
+  "crop": "rubber",
+  "en": "Ungraded sheet",
+  "kn": "ಗ್ರೇಡ್ ರಹಿತ ಶೀಟ್",
+  "aliases": [
+   "ungraded",
+   "ungraded sheet",
+   "ugs",
+   "ಗ್ರೇಡ್ ರಹಿತ"
+  ]
+ },
+ {
+  "id": "scrap",
+  "crop": "rubber",
+  "en": "Scrap (Ottupal)",
+  "kn": "ಒಟ್ಟುಪಾಲ್ / ಸ್ಕ್ರಾಪ್",
+  "aliases": [
+   "scrap",
+   "ottupal",
+   "ottupaal",
+   "ಒಟ್ಟುಪಾಲ್",
+   "ಸ್ಕ್ರಾಪ್"
+  ]
+ },
+ {
+  "id": "rubber_other",
+  "crop": "rubber",
+  "en": "Rubber (other)",
+  "kn": "ರಬ್ಬರ್ (ಇತರೆ)",
+  "aliases": [
+   "rubber",
+   "other rubber"
+  ]
+ }
+]

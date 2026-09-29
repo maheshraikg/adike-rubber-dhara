@@ -1,0 +1,25 @@
+# Manually probe data sources (data.gov.in filter syntax, official page URLs, MET Norway).
+# Copy the log output into ./docs/DATA_SOURCES.md.
+name: Adike – probe sources
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./pipeline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - env:
+          DATA_GOV_IN_KEY: ${{ secrets.DATA_GOV_IN_KEY }}
+        run: python -m tools.probe_sources --config ../data
