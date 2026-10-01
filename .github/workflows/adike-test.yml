@@ -62,6 +62,8 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      - name: Release-style build config (empty optional defines)
+        run: flutter test test/config_test.dart --dart-define=DATA_BASE_URL= --dart-define=GITHUB_REPO=
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:

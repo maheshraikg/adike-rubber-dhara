@@ -3,16 +3,17 @@
 /// only in GitHub Actions secrets, never in the app.
 class AppConfig {
   /// GitHub Pages base URL that serves /data/*.json (gh-pages branch).
-  static const dataBaseUrl = String.fromEnvironment(
-    'DATA_BASE_URL',
-    defaultValue: 'https://maheshraikg.github.io/adike-rubber-dhara/',
-  );
+  /// The release workflow passes `--dart-define=DATA_BASE_URL=` with an empty
+  /// value when the optional repository variable is unset, which
+  /// String.fromEnvironment does not replace with its default; treat empty as unset.
+  static const _dataBaseUrlDefine = String.fromEnvironment('DATA_BASE_URL');
+  static const dataBaseUrl = _dataBaseUrlDefine == ''
+      ? 'https://maheshraikg.github.io/adike-rubber-dhara/'
+      : _dataBaseUrlDefine;
 
   /// Repository hosting the pipeline (for the admin "Run now" link).
-  static const githubRepo = String.fromEnvironment(
-    'GITHUB_REPO',
-    defaultValue: 'maheshraikg/adike-rubber-dhara',
-  );
+  static const _githubRepoDefine = String.fromEnvironment('GITHUB_REPO');
+  static const githubRepo = _githubRepoDefine == '' ? 'maheshraikg/adike-rubber-dhara' : _githubRepoDefine;
 
   static const collectWorkflowFile = 'adike-collect.yml';
 
