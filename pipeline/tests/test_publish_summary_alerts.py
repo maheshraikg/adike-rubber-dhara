@@ -76,7 +76,7 @@ def test_template_summary_without_ai():
                  marketId="kottayam", trust="official", modal=190, date="2026-09-29", changePct=None)]
     s = build_summary(rows, "2026-09-29", {"shivamogga": {"kn": "ಶಿವಮೊಗ್ಗ", "en": "Shivamogga"}}, None, "t")
     assert s["source"] == "template" and s["evening"]
-    assert "₹52,500" in s["en"] and "Shivamogga" in s["en"] and "▲1.2%" in s["kn"]
+    assert "₹52,500" in s["en"] and "Shivamogga" in s["en"] and "(+1.2%)" in s["kn"]
     assert "RSS-4" in s["en"]
 
 

@@ -11,6 +11,7 @@ import 'detail_screen.dart';
 import 'share_card_screen.dart';
 import 'weather_screen.dart';
 
+/// Big two-option switch: ಅಡಿಕೆ / ರಬ್ಬರ್.
 class CropToggle extends StatelessWidget {
   final String crop;
   final ValueChanged<String> onChanged;
@@ -19,13 +20,46 @@ class CropToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    return SegmentedButton<String>(
-      segments: [
-        ButtonSegment(value: 'arecanut', label: Text(t.cropArecanut), icon: const Text('🌰')),
-        ButtonSegment(value: 'rubber', label: Text(t.cropRubber), icon: const Text('🌳')),
-      ],
-      selected: {crop},
-      onSelectionChanged: (v) => onChanged(v.first),
+    final scheme = Theme.of(context).colorScheme;
+    Widget option(String value, String label, IconData icon) {
+      final sel = crop == value;
+      return Expanded(
+        child: Semantics(
+          selected: sel,
+          button: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => onChanged(value),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: sel ? scheme.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(icon, size: 20, color: sel ? scheme.onPrimary : scheme.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Text(label,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: sel ? scheme.onPrimary : scheme.onSurfaceVariant)),
+              ]),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: scheme.surfaceContainerHigh, borderRadius: BorderRadius.circular(18)),
+      child: Row(children: [
+        option('arecanut', t.cropArecanut, Icons.eco),
+        const SizedBox(width: 4),
+        option('rubber', t.cropRubber, Icons.water_drop),
+      ]),
     );
   }
 }
@@ -63,7 +97,12 @@ class TodayScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.appTitle),
+        titleSpacing: 16,
+        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(t.appTitle),
+          Text(DateFormat('EEEE, d MMMM', s.settings.language).format(DateTime.now()),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        ]),
         actions: [
           IconButton(
             tooltip: t.weatherTitle,
@@ -89,8 +128,8 @@ class TodayScreen extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 24),
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: Center(child: CropToggle(crop: s.crop, onChanged: s.setCrop)),
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+              child: CropToggle(crop: s.crop, onChanged: s.setCrop),
             ),
             if (data?.latest.sample == true) _Banner(text: t.sampleData, color: Colors.orange),
             if (data != null && (data.offline || s.error != null))
@@ -98,8 +137,14 @@ class TodayScreen extends StatelessWidget {
             else if (data != null && data.latest.updatedAt.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                child: Text(t.lastUpdated(_fmtIso(data.latest.updatedAt, s.settings.language)),
-                    style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.update, size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(t.lastUpdated(_fmtIso(data.latest.updatedAt, s.settings.language)),
+                        style: Theme.of(context).textTheme.bodySmall, overflow: TextOverflow.ellipsis),
+                  ),
+                ]),
               ),
             if (s.loading && data == null) const Padding(padding: EdgeInsets.all(48), child: Center(child: CircularProgressIndicator())),
             if (!s.loading && data == null && s.error != null)
@@ -108,8 +153,8 @@ class TodayScreen extends StatelessWidget {
             if (data != null && rows.isEmpty)
               Padding(padding: const EdgeInsets.all(32), child: Text(t.noData, textAlign: TextAlign.center)),
             for (var i = 0; i < groups.length; i++) ...[
-              if (i == 0 && favCount > 0) _Header(t.myMarkets),
-              if (i == favCount && groups.length > favCount) _Header(t.otherMarkets),
+              if (i == 0 && favCount > 0) _Header(t.myMarkets, icon: Icons.star_rounded),
+              if (i == favCount && groups.length > favCount) _Header(t.otherMarkets, icon: Icons.storefront_outlined),
               _MarketCard(marketId: groups[i].key, rows: groups[i].value),
             ],
             Padding(
@@ -122,21 +167,29 @@ class TodayScreen extends StatelessWidget {
     );
   }
 
-  static String _fmtTime(DateTime d, String locale) => DateFormat('d MMM, h:mm a', locale).format(d);
+  static String _fmtTime(DateTime d, String locale) => DateFormat('d MMM, HH:mm', locale).format(d);
   static String _fmtIso(String iso, String locale) {
     final d = DateTime.tryParse(iso);
-    return d == null ? iso : DateFormat('d MMM, h:mm a', locale).format(d);
+    return d == null ? iso : DateFormat('d MMM, HH:mm', locale).format(d);
   }
 }
 
 class _Header extends StatelessWidget {
   final String text;
-  const _Header(this.text);
+  final IconData icon;
+  const _Header(this.text, {required this.icon});
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-        child: Text(text, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.secondary)),
-      );
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.secondary;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 16, 16, 4),
+      child: Row(children: [
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 6),
+        Text(text, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: color, fontWeight: FontWeight.w700)),
+      ]),
+    );
+  }
 }
 
 class _Banner extends StatelessWidget {
@@ -146,9 +199,13 @@ class _Banner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-        child: Text(text, textAlign: TextAlign.center, style: TextStyle(color: color.withValues(alpha: 1), fontWeight: FontWeight.w600)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
+        child: Row(children: [
+          Icon(Icons.info_outline, size: 18, color: color),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.w600))),
+        ]),
       );
 }
 
@@ -160,24 +217,37 @@ class _SummaryCard extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final s = AppScope.of(context);
     final theme = Theme.of(context);
-    return Card(
-      color: theme.colorScheme.secondaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.auto_awesome, size: 18),
-            const SizedBox(width: 6),
-            Text(t.summaryTitle, style: theme.textTheme.titleSmall),
-            const Spacer(),
-            if (summary.date.isNotEmpty) Text(shortDate(summary.date, s.settings.language), style: theme.textTheme.bodySmall),
-          ]),
-          const SizedBox(height: 6),
-          Text(s.kn ? summary.kn : summary.en),
-          const SizedBox(height: 4),
-          Text(t.summaryNote, style: theme.textTheme.bodySmall),
-        ]),
+    final scheme = theme.colorScheme;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [scheme.primaryContainer, scheme.secondaryContainer],
+        ),
       ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.auto_awesome, size: 18, color: scheme.onPrimaryContainer),
+          const SizedBox(width: 6),
+          Text(t.summaryTitle,
+              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, color: scheme.onPrimaryContainer)),
+          const Spacer(),
+          if (summary.date.isNotEmpty)
+            Text(shortDate(summary.date, s.settings.language),
+                style: theme.textTheme.bodySmall?.copyWith(color: scheme.onPrimaryContainer)),
+        ]),
+        const SizedBox(height: 8),
+        Text(s.kn ? summary.kn : summary.en,
+            style: theme.textTheme.bodyMedium?.copyWith(height: 1.5, color: scheme.onPrimaryContainer)),
+        const SizedBox(height: 6),
+        Text(t.summaryNote,
+            style: theme.textTheme.bodySmall?.copyWith(
+                fontStyle: FontStyle.italic, color: scheme.onPrimaryContainer.withValues(alpha: 0.75))),
+      ]),
     );
   }
 }
@@ -192,20 +262,33 @@ class _MarketCard extends StatelessWidget {
     final s = AppScope.of(context);
     final t = AppLocalizations.of(context);
     final m = s.market(marketId);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Card(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+        Container(
+          color: scheme.surfaceContainer,
+          padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
           child: Row(children: [
-            Text(s.marketName(marketId), style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(width: 8),
-            if (m != null) Expanded(child: Text(m.district, style: Theme.of(context).textTheme.bodySmall)),
-            Text(unitLabel(rows.first.crop, t), style: Theme.of(context).textTheme.bodySmall),
+            Icon(Icons.location_on, size: 20, color: scheme.primary),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(s.marketName(marketId),
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                if (m != null && m.district.isNotEmpty) Text(m.district, style: theme.textTheme.bodySmall),
+              ]),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(8)),
+              child: Text(unitLabel(rows.first.crop, t), style: theme.textTheme.labelSmall),
+            ),
           ]),
         ),
         for (final r in rows) ...[
           PriceTile(r, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailScreen(row: r)))),
-          if (r != rows.last) const Divider(height: 1, indent: 12, endIndent: 12),
+          if (r != rows.last) const Divider(height: 1, indent: 16, endIndent: 16),
         ],
       ]),
     );

@@ -16,17 +16,54 @@ import 'screens/today_screen.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
+/// Brand colours: areca green + husk brown.
+const brandGreen = Color(0xFF2E7D32);
+const brandBrown = Color(0xFF8D6E63);
+
 ThemeData buildTheme(Brightness b) {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: const Color(0xFF2E7D32),
-    secondary: const Color(0xFF8D6E63),
-    brightness: b,
-  );
-  return ThemeData(
-    useMaterial3: true,
-    colorScheme: scheme,
-    cardTheme: const CardThemeData(margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
-    visualDensity: VisualDensity.standard,
+  final scheme = ColorScheme.fromSeed(seedColor: brandGreen, secondary: brandBrown, brightness: b);
+  final base = ThemeData(useMaterial3: true, colorScheme: scheme, brightness: b);
+  // Roboto (system) for Latin/digits, bundled Noto Sans Kannada for Kannada.
+  final text = base.textTheme.apply(fontFamilyFallback: const ['NotoSansKannada']);
+  return base.copyWith(
+    textTheme: text,
+    primaryTextTheme: base.primaryTextTheme.apply(fontFamilyFallback: const ['NotoSansKannada']),
+    scaffoldBackgroundColor: scheme.surfaceContainerLowest,
+    appBarTheme: AppBarTheme(
+      backgroundColor: scheme.surfaceContainerLowest,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 1,
+      titleTextStyle: text.titleLarge?.copyWith(fontWeight: FontWeight.w700, color: scheme.onSurface),
+    ),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      color: scheme.surfaceContainerLow,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.6)),
+      ),
+      clipBehavior: Clip.antiAlias,
+    ),
+    chipTheme: base.chipTheme.copyWith(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      filled: true,
+      fillColor: scheme.surfaceContainerLow,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(0, 48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        textStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+      ),
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: scheme.surfaceContainer,
+      indicatorColor: scheme.primaryContainer,
+      labelTextStyle: WidgetStatePropertyAll(text.labelSmall?.copyWith(fontWeight: FontWeight.w600)),
+    ),
+    dividerTheme: DividerThemeData(color: scheme.outlineVariant.withValues(alpha: 0.5), space: 1),
   );
 }
 
@@ -34,7 +71,7 @@ class AdikeApp extends StatelessWidget {
   final AppState state;
   /// Flutter web build = admin console (hosted at /admin on GitHub Pages).
   final bool adminOnly;
-  const AdikeApp({super.key, required this.state, this.adminOnly = kIsWeb});
+  const AdikeApp({super.key, required this.state, this.adminOnly = kIsWeb && !const bool.fromEnvironment('FARMER_WEB')});
 
   @override
   Widget build(BuildContext context) {

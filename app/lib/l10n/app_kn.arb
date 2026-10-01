@@ -1,7 +1,7 @@
 {
   "@@locale": "kn",
   "appTitle": "ಅಡಿಕೆ–ರಬ್ಬರ್ ಧಾರಣೆ",
-  "navToday": "ಇಂದಿನ ಧಾರಣೆ",
+  "navToday": "ಇಂದು",
   "navCompare": "ಹೋಲಿಕೆ",
   "navCalculator": "ಲೆಕ್ಕ",
   "navDiary": "ದಾಖಲೆ",
@@ -152,7 +152,7 @@
   "rawExcerpt": "ಮೂಲ ಪಠ್ಯ",
   "reviewEmpty": "ಪರಿಶೀಲಿಸಲು ಏನೂ ಇಲ್ಲ.",
   "runNow": "ಈಗ ಸಂಗ್ರಹಿಸಿ (GitHub)",
-  "notAdmin": "ಈ ಖಾತೆ ನಿರ್ವಾಹಕ ಅಲ್ಲ. ಮಾಲೀಕರು tools/set_claim.py ಚಲಾಯಿಸಬೇಕು, ನಂತರ ಮತ್ತೆ ಲಾಗಿನ್ ಆಗಿ.",
+  "notAdmin": "ಈ ಖಾತೆ ಇನ್ನೂ ನಿರ್ವಾಹಕ ಅಲ್ಲ. GitHub ನಲ್ಲಿ “Adike – set user role” (role: admin) ವರ್ಕ್‌ಫ್ಲೋ ಚಲಾಯಿಸಿ, ನಂತರ ಲಾಗ್ ಔಟ್ ಮಾಡಿ ಮತ್ತೆ ಲಾಗಿನ್ ಆಗಿ.",
   "approved": "ಅನುಮೋದಿತ",
   "sourceId": "ಮೂಲ ಐಡಿ",
   "type": "ಪ್ರಕಾರ",

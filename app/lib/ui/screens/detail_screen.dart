@@ -261,7 +261,9 @@ class PriceChart extends StatelessWidget {
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 56,
-            getTitlesWidget: (v, meta) => SideTitleWidget(
+            getTitlesWidget: (v, meta) => (v == meta.max || v == meta.min)
+                ? const SizedBox.shrink()
+                : SideTitleWidget(
               meta: meta,
               child: Text(rubber ? v.toStringAsFixed(0) : '${(v / 1000).toStringAsFixed(1)}k', style: const TextStyle(fontSize: 10)),
             ),

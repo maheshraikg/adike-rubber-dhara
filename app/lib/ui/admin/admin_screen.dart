@@ -282,8 +282,8 @@ class _PartnersTab extends StatelessWidget {
                 initialValue: type,
                 decoration: InputDecoration(labelText: t.type),
                 items: const [
-                  DropdownMenuItem(value: 'partner', child: Text('partner 🔵')),
-                  DropdownMenuItem(value: 'trader', child: Text('trader 🟡')),
+                  DropdownMenuItem(value: 'partner', child: Text('partner')),
+                  DropdownMenuItem(value: 'trader', child: Text('trader')),
                 ],
                 onChanged: (v) => set(() => type = v!),
               ),

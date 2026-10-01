@@ -230,7 +230,7 @@
   "rawExcerpt": "Raw source text",
   "reviewEmpty": "Nothing to review.",
   "runNow": "Run collection now (GitHub)",
-  "notAdmin": "This account is not an admin. Ask the owner to run tools/set_claim.py, then sign in again.",
+  "notAdmin": "This account is not an admin yet. Run the GitHub workflow “Adike – set user role” (role: admin) for this email, then sign out and sign in again.",
   "approved": "Approved",
   "sourceId": "Source id",
   "type": "Type",
