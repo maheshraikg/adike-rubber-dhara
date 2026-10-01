@@ -66,7 +66,10 @@ Keep a notes file open: several steps give you a value to copy into GitHub later
 
 ## B. Free API keys (≈ 5 min)
 
-**B1. data.gov.in** (official mandi prices)
+**B1. data.gov.in** (official mandi prices) — *optional*
+Without your own key the robot uses data.gov.in's public sample key (shown on every data.gov.in
+dataset page; 10 rows per request, so it pages through). Your own key is faster and has higher
+limits; add it when the login works:
 1. <https://data.gov.in> → **Login / Sign up** (email + OTP to your email).
 2. After login: your name (top right) → **My Account** → **Generate Key** (API key). Copy it → **DATA_GOV_IN_KEY**.
 
@@ -86,7 +89,7 @@ Open <https://github.com/maheshraikg/adike-rubber-dhara> → **Settings** → le
 
 | Name | Value |
 |---|---|
-| `DATA_GOV_IN_KEY` | from B1 |
+| `DATA_GOV_IN_KEY` | from B1 (optional; the public sample key is used without it) |
 | `GEMINI_API_KEY` | from B2 (skip if you have none) |
 | `FIREBASE_SERVICE_ACCOUNT` | open the JSON file from A8, copy **all** of it, paste |
 

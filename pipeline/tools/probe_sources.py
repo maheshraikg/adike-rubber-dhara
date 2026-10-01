@@ -65,10 +65,9 @@ def main() -> None:
     ap.add_argument("--config", default="../data")
     a = ap.parse_args()
     key = os.environ.get("DATA_GOV_IN_KEY", "")
-    if key:
-        probe_datagov(key)
-    else:
-        print("DATA_GOV_IN_KEY not set: skipping data.gov.in probe")
+    if not key:
+        print("DATA_GOV_IN_KEY not set: probing with data.gov.in's public sample key")
+    probe_datagov(key or config.DATAGOV_SAMPLE_KEY)
     probe_pages(Path(a.config))
 
 

@@ -49,20 +49,28 @@ def build_params(api_key: str, state: str, commodity: str, offset: int,
     }
 
 
+def paging(api_key: str) -> tuple[int, int]:
+    """(page size, max pages): the public sample key only returns 10 records a call."""
+    if api_key == config.DATAGOV_SAMPLE_KEY:
+        return config.DATAGOV_SAMPLE_PAGE_LIMIT, config.DATAGOV_SAMPLE_MAX_PAGES
+    return config.DATAGOV_PAGE_LIMIT, config.DATAGOV_MAX_PAGES
+
+
 def fetch_query(fetcher: Fetcher, api_key: str, state: str, commodity: str,
                 resource: str = config.DATAGOV_DAILY_RESOURCE) -> list[dict]:
     """Fetch all pages. Tries `filters[x.keyword]` first, then plain `filters[x]`
     (both forms are seen in the wild; see docs/DATA_SOURCES.md)."""
     url = config.DATAGOV_BASE + resource
+    limit, max_pages = paging(api_key)
     for keyword in (True, False):
         out: list[dict] = []
-        for page in range(config.DATAGOV_MAX_PAGES):
-            params = build_params(api_key, state, commodity, page * config.DATAGOV_PAGE_LIMIT, keyword)
+        for page in range(max_pages):
+            params = build_params(api_key, state, commodity, page * limit, keyword, limit=limit)
             data = fetcher.get(SOURCE_ID, url, params=params, check_robots=False).json()
             recs = data.get("records") or []
             out.extend(recs)
             total = int(data.get("total") or 0)
-            if len(recs) < config.DATAGOV_PAGE_LIMIT or len(out) >= total:
+            if len(recs) < limit or len(out) >= total:
                 break
         if out:
             log_event("datagov.fetched", state=state, commodity=commodity, rows=len(out), keyword=keyword)

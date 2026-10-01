@@ -1,3 +1,4 @@
+from adike_pipeline import config
 from adike_pipeline.normalize import normalize
 from adike_pipeline.sources import datagov
 from adike_pipeline.util import Fetcher
@@ -61,3 +62,32 @@ def test_fetch_falls_back_to_plain_filters(fixture_json):
     recs = datagov.fetch_query(f, "K", "Karnataka", "Arecanut(Betelnut/Supari)")
     assert len(recs) == 4
     assert len(sess.calls) == 2
+
+
+class PagedSession:
+    """Serves `n` records at most 10 per call, like the public sample key."""
+
+    def __init__(self, n):
+        self.n, self.headers, self.calls = n, {}, []
+
+    def get(self, url, params=None, timeout=None):
+        self.calls.append(params)
+        off, lim = params["offset"], min(params["limit"], 10)
+        recs = [{"market": f"M{i}", "modal_price": "50000"} for i in range(off, min(off + lim, self.n))]
+        return FakeResp({"total": self.n, "records": recs})
+
+
+def test_sample_key_pages_in_tens():
+    sess = PagedSession(23)
+    f = Fetcher(max_per_source=50, session=sess, sleep=lambda a: None)
+    recs = datagov.fetch_query(f, config.DATAGOV_SAMPLE_KEY, "Karnataka", "Arecanut(Betelnut/Supari)")
+    assert len(recs) == 23
+    assert [c["offset"] for c in sess.calls] == [0, 10, 20]
+    assert all(c["limit"] == 10 for c in sess.calls)
+
+
+def test_personal_key_uses_large_pages():
+    sess = PagedSession(5)
+    f = Fetcher(max_per_source=50, session=sess, sleep=lambda a: None)
+    datagov.fetch_query(f, "PERSONAL", "Karnataka", "Arecanut(Betelnut/Supari)")
+    assert sess.calls[0]["limit"] == config.DATAGOV_PAGE_LIMIT

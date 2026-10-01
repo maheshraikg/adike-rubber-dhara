@@ -29,6 +29,12 @@ DATAGOV_QUERIES = [
 ]
 DATAGOV_PAGE_LIMIT = 1000
 DATAGOV_MAX_PAGES = 5
+# Public sample key that data.gov.in itself shows on every resource page, for use
+# without registering. It returns at most 10 records per request, so it is paged
+# in steps of 10. A personal key (DATA_GOV_IN_KEY secret) is used when set.
+DATAGOV_SAMPLE_KEY = "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b"
+DATAGOV_SAMPLE_PAGE_LIMIT = 10
+DATAGOV_SAMPLE_MAX_PAGES = 20
 
 # --- fetching ------------------------------------------------------------
 MAX_REQUESTS_PER_SOURCE = 3
