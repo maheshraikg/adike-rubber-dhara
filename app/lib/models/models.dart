@@ -91,10 +91,22 @@ class Latest {
   static const empty = Latest(updatedAt: '', rows: []);
 }
 
+List<String> _strs(dynamic v) => v is List ? v.map((e) => e.toString()).toList() : const [];
+
 class Market {
   final String id, en, kn, district, region;
   final double? lat, lon;
-  const Market({required this.id, required this.en, required this.kn, this.district = '', this.region = 'other', this.lat, this.lon});
+  final List<String> aliases;
+  const Market({
+    required this.id,
+    required this.en,
+    required this.kn,
+    this.district = '',
+    this.region = 'other',
+    this.lat,
+    this.lon,
+    this.aliases = const [],
+  });
 
   factory Market.fromJson(Map<String, dynamic> j) => Market(
         id: j['id'] as String,
@@ -104,6 +116,7 @@ class Market {
         region: (j['region'] ?? 'other') as String,
         lat: _d(j['lat']),
         lon: _d(j['lon']),
+        aliases: _strs(j['aliases']),
       );
 
   String name(bool kannada) => kannada ? kn : en;
@@ -111,9 +124,15 @@ class Market {
 
 class Variety {
   final String id, crop, en, kn;
-  const Variety({required this.id, required this.crop, required this.en, required this.kn});
-  factory Variety.fromJson(Map<String, dynamic> j) =>
-      Variety(id: j['id'] as String, crop: j['crop'] as String, en: j['en'] as String, kn: j['kn'] as String);
+  final List<String> aliases;
+  const Variety({required this.id, required this.crop, required this.en, required this.kn, this.aliases = const []});
+  factory Variety.fromJson(Map<String, dynamic> j) => Variety(
+        id: j['id'] as String,
+        crop: j['crop'] as String,
+        en: j['en'] as String,
+        kn: j['kn'] as String,
+        aliases: _strs(j['aliases']),
+      );
   String name(bool kannada) => kannada ? kn : en;
 }
 

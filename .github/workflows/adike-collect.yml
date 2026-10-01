@@ -60,6 +60,8 @@ jobs:
         working-directory: ${{ env.APP_DIR }}/pipeline
         env:
           DATA_GOV_IN_KEY: ${{ secrets.DATA_GOV_IN_KEY }}
+          DATAGOV_RELAY_URL: ${{ vars.ADIKE_RELAY_URL }}
+          DATAGOV_RELAY_TOKEN: ${{ secrets.ADIKE_RELAY_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |

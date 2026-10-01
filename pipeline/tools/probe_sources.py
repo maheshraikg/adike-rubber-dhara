@@ -18,6 +18,9 @@ from adike_pipeline.util import read_json
 def probe_datagov(key: str) -> None:
     s = requests.Session()
     s.headers["User-Agent"] = config.USER_AGENT
+    if config.DATAGOV_RELAY_TOKEN:
+        s.headers["x-relay-token"] = config.DATAGOV_RELAY_TOKEN
+    print(f"[datagov] via {config.DATAGOV_BASE}")
     for resource in (config.DATAGOV_DAILY_RESOURCE, config.DATAGOV_HISTORY_RESOURCE):
         url = config.DATAGOV_BASE + resource
         for q in config.DATAGOV_QUERIES:

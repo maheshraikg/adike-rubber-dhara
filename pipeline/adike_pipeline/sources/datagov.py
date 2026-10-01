@@ -34,7 +34,7 @@ def parse_records(records: Iterable[dict], crop: str, collected_time: str) -> li
             modal=parse_number(_get(rec, "modal_price")), unit_raw=None,
             date_raw=_get(rec, "arrival_date"), confidence=None, via="api",
             time=collected_time[11:16],
-            sourceUrl=config.DATAGOV_BASE + config.DATAGOV_DAILY_RESOURCE,
+            sourceUrl="https://api.data.gov.in/resource/" + config.DATAGOV_DAILY_RESOURCE,
             rawExcerpt=str({k: rec.get(k) for k in list(rec)[:12]}),
         ))
     return rows

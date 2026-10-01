@@ -42,6 +42,22 @@ class AppState extends ChangeNotifier {
       loading = false;
       notifyListeners();
     }
+    unawaited(_addLiveMandi());
+  }
+
+  /// data.gov.in blocks the collection robot, so the phone reads it itself and
+  /// adds rows the published file doesn't have yet. Runs after the published
+  /// prices are on screen; failures are silent.
+  Future<void> _addLiveMandi() async {
+    final base = data;
+    if (base == null) return;
+    try {
+      final live = await repo.liveMandi(base);
+      if (identical(data, base) && live.isNotEmpty) {
+        data = base.withLive(live);
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   Future<void> setCrop(String c) async {

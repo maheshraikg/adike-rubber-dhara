@@ -22,6 +22,8 @@ jobs:
       - run: pip install -r requirements.txt
       - env:
           DATA_GOV_IN_KEY: ${{ secrets.DATA_GOV_IN_KEY }}
+          DATAGOV_RELAY_URL: ${{ vars.ADIKE_RELAY_URL }}
+          DATAGOV_RELAY_TOKEN: ${{ secrets.ADIKE_RELAY_TOKEN }}
         run: python -m tools.probe_sources --config ../data
       - name: Discover price pages (follows price/rate links)
         run: python -m tools.discover_sources

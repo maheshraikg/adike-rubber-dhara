@@ -111,6 +111,8 @@ class Runner:
         self.ai = ai if ai is not None else make_provider(self.cfg)
         self.fetcher = fetcher or Fetcher()
         self.api_fetcher = api_fetcher or Fetcher(max_per_source=150)
+        if config.DATAGOV_RELAY_TOKEN:
+            self.api_fetcher.session.headers["x-relay-token"] = config.DATAGOV_RELAY_TOKEN
         self.datagov_key = datagov_key
         self.admin_alert = admin_alert
         self.publisher = Publisher(site, config_dir, self.today)

@@ -44,6 +44,8 @@ def main() -> None:
     norm = Normalizer(read_json(cfgdir / "markets.json", []), read_json(cfgdir / "varieties.json", []))
     cfg = merged_config({})
     fetcher = Fetcher(max_per_source=10 ** 6)
+    if config.DATAGOV_RELAY_TOKEN:
+        fetcher.session.headers["x-relay-token"] = config.DATAGOV_RELAY_TOKEN
     url = config.DATAGOV_BASE + config.DATAGOV_HISTORY_RESOURCE
     total = 0
     for back in range(a.days, 0, -1):

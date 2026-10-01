@@ -187,6 +187,28 @@ First launch: choose your markets → the Today screen shows prices.
 
 ---
 
+## G. Arecanut mandi prices (data.gov.in)
+
+data.gov.in refuses connections from GitHub's servers, so the robot cannot read it directly.
+
+- **On phones (automatic):** the app reads data.gov.in itself (phones in India are not blocked)
+  with the public sample key and shows rows marked *data.gov.in, live*. Nothing to set up.
+- **For the robot (history, alerts, review queue): a free Cloudflare relay** (≈ 10 min, no card)
+  1. <https://dash.cloudflare.com/sign-up> → sign up with email (Free plan).
+  2. Account ID: Cloudflare home → **Workers & Pages** → right side *Account ID* → copy.
+  3. API token: top-right profile → **My Profile → API Tokens → Create Token** →
+     template **Edit Cloudflare Workers** → Continue → Create → copy the token.
+  4. GitHub → Settings → Secrets and variables → Actions → **New repository secret**, three times:
+     `CLOUDFLARE_ACCOUNT_ID` (step 2), `CLOUDFLARE_API_TOKEN` (step 3),
+     `ADIKE_RELAY_TOKEN` (any long random text — it is a password between robot and relay).
+  5. Actions → **Adike – deploy data.gov.in relay** → Run workflow. When green, open the run:
+     it prints the relay URL (`https://adike-datagov-relay.<name>.workers.dev`) and whether
+     data.gov.in answered.
+  6. If it answered: Variables tab → **New repository variable** `ADIKE_RELAY_URL` = that URL.
+     The next collection run uses it.
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |
