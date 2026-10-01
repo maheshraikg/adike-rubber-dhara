@@ -16,8 +16,8 @@
  {
   "id": "rubberboard_daily",
   "type": "official",
-  "kind": "html",
-  "enabled": false,
+  "kind": "parser",
+  "enabled": true,
   "crops": [
    "rubber"
   ],
@@ -25,8 +25,8 @@
   "name_kn": "ರಬ್ಬರ್ ಮಂಡಳಿ – ದೈನಂದಿನ ಧಾರಣೆ",
   "url": "https://rubberboard.gov.in/public",
   "defaultMarketId": "kottayam",
-  "verified": false,
-  "note": "Enable after running the probe workflow and confirming the page URL."
+  "verified": true,
+  "note": "Board's daily Kottayam rates (₹/kg) from the public page; parsed directly, no AI."
  },
  {
   "id": "agmarknet_report",

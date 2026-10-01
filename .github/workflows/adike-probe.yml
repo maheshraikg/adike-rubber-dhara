@@ -25,3 +25,5 @@ jobs:
         run: python -m tools.probe_sources --config ../data
       - name: Discover price pages (follows price/rate links)
         run: python -m tools.discover_sources
+      - name: Rubber Board parser (live)
+        run: python -m tools.check_rubberboard

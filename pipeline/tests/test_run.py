@@ -1,7 +1,8 @@
-"""End-to-end run with fakes: API rows, a web page via AI, a partner photo submission,
-review queue and admin decisions."""
+"""End-to-end run with fakes: API rows, the Rubber Board parser, a web page via AI,
+a partner photo submission, review queue and admin decisions."""
 import base64
 import json
+from pathlib import Path
 
 from adike_pipeline.ai.base import AIProvider, AIUnavailable
 from adike_pipeline.models import AIExtractedRow, AIExtraction, AISummary
@@ -54,7 +55,16 @@ class Session:
             key = params.get("filters[commodity.keyword]") or params.get("filters[commodity]")
             state = params.get("filters[state.keyword]") or params.get("filters[state]")
             return Resp(self.fx.get((state, key), {"total": 0, "records": []}))
+        if "rubberboard.gov.in" in url:
+            return Resp(text=RB_HTML, ctype="text/html")
         return Resp(text="<table><tr><td>RSS-4</td><td>19000</td></tr></table>", ctype="text/html")
+
+
+RB_HTML = (Path(__file__).parent / "fixtures" / "rubberboard_public.html").read_text()
+# stand-in official page that goes through the HTML -> AI path
+WEB_SRC = {"id": "gov_rates_page", "type": "official", "kind": "html", "enabled": True,
+           "crops": ["rubber"], "name_en": "Test rates page", "name_kn": "ಪರೀಕ್ಷೆ",
+           "url": "https://rates.example.gov.in/today", "defaultMarketId": "kottayam"}
 
 
 def setup(tmp_path, config_dir, fixture_json, sources_extra=None):
@@ -63,10 +73,7 @@ def setup(tmp_path, config_dir, fixture_json, sources_extra=None):
     for n in ("markets.json", "varieties.json"):
         (cfg / n).write_text((config_dir / n).read_text())
     sources = json.loads((config_dir / "sources.json").read_text())
-    for s in sources:
-        if s["id"] == "rubberboard_daily":
-            s["enabled"] = True
-    (cfg / "sources.json").write_text(json.dumps(sources + (sources_extra or [])))
+    (cfg / "sources.json").write_text(json.dumps(sources + [WEB_SRC] + (sources_extra or [])))
     site = tmp_path / "site"
     fx = {("Karnataka", "Arecanut(Betelnut/Supari)"): fixture_json("datagov_arecanut.json")}
     return cfg, site, Session(fx)
@@ -98,9 +105,13 @@ def test_full_run(tmp_path, config_dir, fixture_json, now):
     latest = json.loads((site / "data" / "latest.json").read_text())
     keys = {(r["sourceId"], r["marketId"], r["variety"]) for r in latest["rows"]}
     assert ("datagov_mandi", "shivamogga", "rashi") in keys
-    assert ("rubberboard_daily", "kottayam", "rss4") in keys
-    rss = [r for r in latest["rows"] if r["variety"] == "rss4" and r["sourceId"] == "rubberboard_daily"][0]
+    assert ("gov_rates_page", "kottayam", "rss4") in keys
+    rss = [r for r in latest["rows"] if r["variety"] == "rss4" and r["sourceId"] == "gov_rates_page"][0]
     assert rss["modal"] == 190 and rss["min"] is None
+    # Rubber Board figures parsed straight from the page, ₹/kg, no AI
+    rb = {r["variety"]: r["modal"] for r in latest["rows"] if r["sourceId"] == "rubberboard_daily"}
+    assert rb == {"rss4": 291.7, "rss5": 285.45, "isnr20": 274.0, "latex60": 212.5}
+    assert not any("291.70" in (t or "") for t, _ in ai.seen)
     # Sagar (swapped), Puttur (no modal), Mudigere (unknown market) -> review
     flagged = {k.split("_", 1)[1] for k in store.docs if k.startswith("review/")}
     assert any("sagar" in k for k in flagged)
@@ -149,7 +160,9 @@ def test_ai_down_defers_and_api_still_publishes(tmp_path, config_dir, fixture_js
     latest = json.loads((site / "data" / "latest.json").read_text())
     assert any(r["sourceId"] == "datagov_mandi" for r in latest["rows"])
     assert store.docs["submissions/s1"]["status"] == "new"
-    assert "deferred" in res.sources["rubberboard_daily"].note
+    assert "deferred" in res.sources["gov_rates_page"].note
+    assert res.sources["rubberboard_daily"].rows == 4  # parser needs no AI
+    assert any(r["sourceId"] == "rubberboard_daily" for r in latest["rows"])
     assert latest["summary"]["source"] == "template"
 
 
@@ -160,6 +173,6 @@ def test_unchanged_page_skips_ai(tmp_path, config_dir, fixture_json, now):
     make_runner(site, cfg, store, ai, now, sess).run()
     ai2 = FakeAI([RUBBER])
     r2 = make_runner(site, cfg, store, ai2, now, sess).run()
-    assert ai2.calls == 0 and "unchanged" in r2.sources["rubberboard_daily"].note
+    assert ai2.calls == 0 and "unchanged" in r2.sources["gov_rates_page"].note
     # latest.json is not rewritten when nothing changed (ETag stays the same)
     assert "data/latest.json" not in r2.changed_files
