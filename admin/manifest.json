@@ -1,11 +1,11 @@
 {
-    "name": "adike_dhara",
-    "short_name": "adike_dhara",
+    "name": "Adike Rubber Rates",
+    "short_name": "Adike Rubber Rates",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F7FBF4",
     "theme_color": "#2E7D32",
-    "description": "Adike–Rubber Dhara: daily arecanut and rubber prices",
+    "description": "Adike Rubber Rates: daily arecanut and rubber prices",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

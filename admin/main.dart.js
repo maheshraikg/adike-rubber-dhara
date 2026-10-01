@@ -48610,7 +48610,7 @@ kh(a){return new A.cL(A.bdo(a),t.kL)},
 qw(a){return B.b.p(A.b(["en","kn"],t.s),a.geb())},
 p8(a){return!1}}
 A.Mt.prototype={
-gJT(){return"Adike\u2013Rubber Dhara"},
+gJT(){return"Adike Rubber Rates"},
 ga24(){return"Online services are not configured in this build."},
 a_Q(a){return"Something went wrong: "+a},
 gKb(){return"Cancel"},
