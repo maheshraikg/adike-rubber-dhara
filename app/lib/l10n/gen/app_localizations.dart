@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Adike–Rubber Dhara'**
+  /// **'Adike Rubber Rates'**
   String get appTitle;
 
   /// No description provided for @navToday.
@@ -1060,7 +1060,7 @@ abstract class AppLocalizations {
   /// No description provided for @shareText.
   ///
   /// In en, this message translates to:
-  /// **'Today\'s arecanut & rubber rates — Adike–Rubber Dhara app'**
+  /// **'Today\'s arecanut & rubber rates — Adike Rubber Rates app'**
   String get shareText;
 }
 

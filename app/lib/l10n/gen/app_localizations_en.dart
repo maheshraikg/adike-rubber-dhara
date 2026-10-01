@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Adike–Rubber Dhara';
+  String get appTitle => 'Adike Rubber Rates';
 
   @override
   String get navToday => 'Today';
@@ -527,5 +527,5 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareText =>
-      'Today\'s arecanut & rubber rates — Adike–Rubber Dhara app';
+      'Today\'s arecanut & rubber rates — Adike Rubber Rates app';
 }
