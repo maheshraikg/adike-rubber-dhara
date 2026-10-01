@@ -29,3 +29,6 @@ jobs:
         run: python -m tools.discover_sources
       - name: Rubber Board parser (live)
         run: python -m tools.check_rubberboard
+      - name: Agmarknet 2.0 report API (live)
+        if: always()
+        run: python -m tools.probe_agmarknet
