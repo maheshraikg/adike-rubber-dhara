@@ -60,7 +60,8 @@ class Session:
         return Resp(text="<table><tr><td>RSS-4</td><td>19000</td></tr></table>", ctype="text/html")
 
 
-RB_HTML = (Path(__file__).parent / "fixtures" / "rubberboard_public.html").read_text()
+RB_HTML = (Path(__file__).parent / "fixtures" / "rubberboard_public.html").read_text().replace(
+    "30-09-2026", "29-09-2026")  # same day as the test run
 # stand-in official page that goes through the HTML -> AI path
 WEB_SRC = {"id": "gov_rates_page", "type": "official", "kind": "html", "enabled": True,
            "crops": ["rubber"], "name_en": "Test rates page", "name_kn": "ಪರೀಕ್ಷೆ",
@@ -109,9 +110,10 @@ def test_full_run(tmp_path, config_dir, fixture_json, now):
     rss = [r for r in latest["rows"] if r["variety"] == "rss4" and r["sourceId"] == "gov_rates_page"][0]
     assert rss["modal"] == 190 and rss["min"] is None
     # Rubber Board figures parsed straight from the page, ₹/kg, no AI
-    rb = {r["variety"]: r["modal"] for r in latest["rows"] if r["sourceId"] == "rubberboard_daily"}
-    assert rb == {"rss4": 291.7, "rss5": 285.45, "isnr20": 274.0, "latex60": 212.5}
-    assert not any("291.70" in (t or "") for t, _ in ai.seen)
+    rb = {(r["marketId"], r["variety"]): r["modal"] for r in latest["rows"]
+          if r["sourceId"] == "rubberboard_daily"}
+    assert rb[("kottayam", "rss4")] == 280.0 and rb[("kochi", "rss5")] == 274.0 and len(rb) == 6
+    assert not any("28000.0" in (t or "") for t, _ in ai.seen)
     # Sagar (swapped), Puttur (no modal), Mudigere (unknown market) -> review
     flagged = {k.split("_", 1)[1] for k in store.docs if k.startswith("review/")}
     assert any("sagar" in k for k in flagged)
@@ -161,7 +163,7 @@ def test_ai_down_defers_and_api_still_publishes(tmp_path, config_dir, fixture_js
     assert any(r["sourceId"] == "datagov_mandi" for r in latest["rows"])
     assert store.docs["submissions/s1"]["status"] == "new"
     assert "deferred" in res.sources["gov_rates_page"].note
-    assert res.sources["rubberboard_daily"].rows == 4  # parser needs no AI
+    assert res.sources["rubberboard_daily"].rows == 6  # parser needs no AI
     assert any(r["sourceId"] == "rubberboard_daily" for r in latest["rows"])
     assert latest["summary"]["source"] == "template"
 

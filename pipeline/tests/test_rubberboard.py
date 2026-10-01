@@ -6,44 +6,53 @@ from adike_pipeline.sources import rubberboard
 
 HTML = (Path(__file__).parent / "fixtures" / "rubberboard_public.html").read_text()
 URL = "https://rubberboard.gov.in/public"
+T = "2026-10-01T11:30"
 
 
-def test_parses_inr_box_only():
-    rows = rubberboard.parse_text(rubberboard.page_text(HTML), "2026-09-29T11:30", URL)
-    got = {r.variety_raw: r.modal for r in rows}
-    assert got == {"RSS-4": 291.70, "RSS-5": 285.45, "ISNR-20": 274.00, "Latex (60% DRC)": 212.50}
-    r = rows[0]
-    assert r.market_raw == "Kottayam" and r.unit_raw == "₹/kg" and r.via == "api"
-    assert r.date_raw == "2026-09-29" and r.note == "dated by collection day"
-    assert r.min is None and r.max is None  # only the single printed figure is used
+def parse(html=HTML):
+    return rubberboard.parse_text(rubberboard.page_text(html), T, URL)
 
 
-def test_uses_printed_date_when_present():
-    html = HTML.replace("Daily Rubber Prices", "Daily Rubber Prices as on 28-09-2026")
-    rows = rubberboard.parse_text(rubberboard.page_text(html), "2026-09-29T11:30", URL)
-    assert rows and all(r.date_raw == "28-09-2026" and r.note is None for r in rows)
+def test_rupee_column_per_market_tab():
+    got = {(r.market_raw, r.variety_raw): r.modal for r in parse()}
+    assert got == {
+        ("kottayam", "RSS-4"): 28000.0, ("kottayam", "RSS-5"): 27400.0,
+        ("kottayam", "ISNR-20"): 26300.0, ("kottayam", "Latex (60% DRC)"): 20395.0,
+        ("kochi", "RSS-4"): 28000.0, ("kochi", "RSS-5"): 27400.0,
+    }  # dollar column ignored; Agartala skipped (not one of our markets)
+    r = parse()[0]
+    assert r.unit_raw == "₹/100kg" and r.via == "api" and r.min is None and r.max is None
+    assert r.date_raw == "30-09-2026" and r.note is None
 
 
-def test_no_rupee_box_gives_no_rows():
-    assert rubberboard.parse_text("Welcome to Rubber Board. RSS4 news", "2026-09-29T11:30", URL) == []
+def test_english_layout():
+    html = (HTML.replace("देशी बाज़ार", "Domestic market").replace("को प्रति 100 कि.ग्रा.", "per 100 Kg")
+            .replace("कोट्टयम", "Kottayam").replace("कोच्ची", "Kochi").replace("अगरतला", "Agartala")
+            .replace("इंडियन रुपये", "Indian Rupees").replace("अमरीकी डॉलर", "US Dollar"))
+    rows = parse(html)
+    assert len(rows) == 6 and {r.market_raw for r in rows} == {"kottayam", "kochi"}
 
 
-def test_rows_normalize_to_known_ids(normalizer):
-    rows = rubberboard.parse_text(rubberboard.page_text(HTML), "2026-09-29T11:30", URL)
+def test_no_printed_date_uses_collection_day():
+    rows = parse(HTML.replace("<span>30-09-2026</span>", ""))
+    assert rows and all(r.date_raw == "2026-10-01" and r.note == "dated by collection day" for r in rows)
+
+
+def test_unrecognised_page_gives_no_rows():
+    assert parse("<p>Welcome to Rubber Board. RSS4 news</p>") == []
+    # figures without the per-100-kg header are not guessed at
+    assert parse(HTML.replace("प्रति 100 कि.ग्रा.", "")) == []
+    # a tab without its table: positions would no longer match markets
+    assert parse(HTML.replace("<li>अगरतला</li>", "<li>अगरतला</li><li>Kochi</li>")) == []
+
+
+def test_rows_normalize_to_rupees_per_kg(normalizer):
     out = {}
-    for raw in rows:
-        row, flags = normalize(raw, normalizer, "official", "2026-09-29T11:30")
+    for raw in parse():
+        row, flags = normalize(raw, normalizer, "official", T)
         assert flags == []
-        out[row.variety] = (row.marketId, row.modal, row.unit)
-    assert out["rss4"] == ("kottayam", 291.70, out["rss4"][2])
-    assert set(out) == {"rss4", "rss5", "isnr20", "latex60"}
-
-
-def test_table_layout_and_header_box():
-    html = """<html><body><header><div>Indian Rupees &#8377;</div>
-    <table><tr><td>RSS4</td><td>291.70</td></tr><tr><td>RSS5</td><td>285.45</td></tr>
-    <tr><td>ISNR20</td><td>274.00</td></tr><tr><td>Latex(60%)</td><td>212.50</td></tr></table>
-    </header><p>Updated 30/09/2026</p></body></html>"""
-    rows = rubberboard.parse_text(rubberboard.page_text(html), "2026-10-01T11:30", URL)
-    assert {r.variety_raw: r.modal for r in rows}["Latex (60% DRC)"] == 212.50
-    assert len(rows) == 4 and rows[0].date_raw == "30/09/2026"
+        out[(row.marketId, row.variety)] = (row.modal, row.date)
+    assert out[("kottayam", "rss4")] == (280.0, "2026-09-30")
+    assert out[("kottayam", "latex60")] == (203.95, "2026-09-30")
+    assert set(out) == {("kottayam", "rss4"), ("kottayam", "rss5"), ("kottayam", "isnr20"),
+                        ("kottayam", "latex60"), ("kochi", "rss4"), ("kochi", "rss5")}

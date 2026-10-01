@@ -26,7 +26,7 @@
   "url": "https://rubberboard.gov.in/public",
   "defaultMarketId": "kottayam",
   "verified": true,
-  "note": "Board's daily Kottayam rates (₹/kg) from the public page; parsed directly, no AI."
+  "note": "Board daily domestic rates (Kottayam, Kochi; ₹/100 kg on the page, published as ₹/kg); parsed directly, no AI."
  },
  {
   "id": "agmarknet_report",
