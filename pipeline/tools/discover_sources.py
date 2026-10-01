@@ -17,10 +17,12 @@ import requests
 from bs4 import BeautifulSoup
 
 from adike_pipeline import config
+from adike_pipeline.util import aia_bundle
 
 START = {
-    "rubberboard": ["https://rubberboard.gov.in/", "https://rubberboard.gov.in/public",
-                    "https://www.rubberboard.org.in/", "http://rubberboard.org.in/"],
+    "rubberboard": ["https://rubberboard.gov.in/public", "https://rubberboard.gov.in/",
+                    "https://rubberboard.gov.in/public/rubber-price",
+                    "https://rubberboard.gov.in/public/price"],
     "krishimaratavahini": ["https://krishimaratavahini.kar.nic.in/",
                            "https://krishimaratavahini.kar.nic.in/MainPage/DailyMrktPriceRep2.aspx",
                            "https://maratavahini.kar.nic.in/"],
@@ -43,7 +45,15 @@ def snippet(text: str, n: int = 12) -> list[str]:
 
 def visit(s: requests.Session, url: str) -> tuple[int, str, BeautifulSoup | None, str]:
     try:
-        r = s.get(url, timeout=25, allow_redirects=True)
+        try:
+            r = s.get(url, timeout=25, allow_redirects=True)
+        except requests.exceptions.SSLError as e:
+            # follow redirects by hand so each host gets its own AIA bundle
+            host = re.sub(r"^https?://([^/]+).*$", r"\1", str(e.request.url if e.request else url))
+            bundle = aia_bundle(host)
+            if not bundle:
+                raise
+            r = s.get(url, timeout=25, allow_redirects=True, verify=bundle)
     except requests.RequestException as e:
         return 0, str(e)[:120], None, url
     ctype = r.headers.get("content-type", "")
