@@ -18,7 +18,7 @@ from .alerts import send_admin_alert
 from .models import AIExtraction, PriceRow, RawRow
 from .normalize import Normalizer, normalize
 from .publish import Publisher, prune_raw, trust_score, update_source_stats
-from .sources import datagov, web
+from .sources import datagov, rubberboard, web
 from .store import Store, make_store, older_than, utcnow
 from .summary import build_summary
 from .util import Fetcher, log_event, now_ist, read_json
@@ -130,6 +130,19 @@ class Runner:
         except Exception as e:  # noqa: BLE001
             self.res.sources[src["id"]] = SourceResult(ok=False, error=str(e)[:300])
             return []
+
+    def collect_rubberboard(self, src: dict) -> list[Item]:
+        try:
+            rows, text = rubberboard.collect(self.fetcher, src, self.tstamp)
+        except Exception as e:  # noqa: BLE001
+            self.res.sources[src["id"]] = SourceResult(ok=False, error=str(e)[:300])
+            return []
+        self.publisher.save_raw(src["id"], "txt", f"URL: {src['url']}\n\n{text}")
+        if not rows:
+            self.res.sources[src["id"]] = SourceResult(ok=False, error="rate box not found on page")
+            return []
+        self.res.sources[src["id"]] = SourceResult(rows=len(rows))
+        return [Item(r, src) for r in rows]
 
     def collect_web(self, src: dict) -> list[Item]:
         sid = src["id"]
@@ -270,6 +283,8 @@ class Runner:
                 continue
             if s["kind"] == "api" and s["id"] == datagov.SOURCE_ID:
                 items += self.collect_datagov(s)
+            elif s["kind"] == "parser" and s["id"] == rubberboard.SOURCE_ID:
+                items += self.collect_rubberboard(s)
             elif s["kind"] in ("html", "pdf"):
                 items += self.collect_web(s)
         items += self.collect_submissions(by_id)

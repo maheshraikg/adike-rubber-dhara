@@ -23,3 +23,7 @@ jobs:
       - env:
           DATA_GOV_IN_KEY: ${{ secrets.DATA_GOV_IN_KEY }}
         run: python -m tools.probe_sources --config ../data
+      - name: Discover price pages (follows price/rate links)
+        run: python -m tools.discover_sources
+      - name: Rubber Board parser (live)
+        run: python -m tools.check_rubberboard

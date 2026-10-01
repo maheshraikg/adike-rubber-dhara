@@ -115,6 +115,67 @@ def backoff_sleep(attempt: int, base: float = 2.0, cap: float = 60.0) -> None:
     time.sleep(min(cap, base * (2 ** attempt)) + random.uniform(0, 1))
 
 
+_AIA_BUNDLES: dict[str, str | None] = {}
+
+
+def aia_bundle(host: str, port: int = 443) -> str | None:
+    """Some government servers do not send their intermediate certificate, so TLS
+    verification fails although the site is valid. Browsers fix this by downloading
+    the missing intermediate from the URL in the certificate (AIA "CA Issuers").
+    Do the same: fetch it, check it really signed the server certificate, and return
+    a CA bundle = certifi roots + those intermediates. Verification stays on."""
+    if host in _AIA_BUNDLES:
+        return _AIA_BUNDLES[host]
+    import ssl
+    import tempfile
+
+    import certifi
+    from cryptography import x509
+    from cryptography.hazmat.primitives.serialization import Encoding
+    from cryptography.x509.oid import AuthorityInformationAccessOID, ExtensionOID
+
+    path = None
+    try:
+        cert = x509.load_pem_x509_certificate(
+            ssl.get_server_certificate((host, port), timeout=HTTP_TIMEOUT_SHORT).encode())
+        chain = []
+        for _ in range(3):
+            try:
+                aia = cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_INFORMATION_ACCESS).value
+            except x509.ExtensionNotFound:
+                break
+            urls = [d.access_location.value for d in aia
+                    if d.access_method == AuthorityInformationAccessOID.CA_ISSUERS]
+            if not urls:
+                break
+            data = requests.get(urls[0], timeout=HTTP_TIMEOUT_SHORT,
+                                headers={"User-Agent": config.USER_AGENT}).content
+            try:
+                issuer = x509.load_der_x509_certificate(data)
+            except ValueError:
+                issuer = x509.load_pem_x509_certificate(data)
+            cert.verify_directly_issued_by(issuer)  # raises if it is not the real issuer
+            if issuer.issuer == issuer.subject:
+                break  # reached a root; roots must come from certifi, not from the server
+            chain.append(issuer)
+            cert = issuer
+        if chain:
+            with open(certifi.where(), "rb") as f:
+                roots = f.read()
+            tmp = tempfile.NamedTemporaryFile("wb", suffix=".pem", delete=False)
+            tmp.write(roots + b"\n" + b"".join(c.public_bytes(Encoding.PEM) for c in chain))
+            tmp.close()
+            path = tmp.name
+            log_event("tls.aia_bundle", host=host, intermediates=len(chain))
+    except Exception as e:  # noqa: BLE001 - best effort; caller reports the original error
+        log_event("tls.aia_failed", host=host, error=str(e)[:200])
+    _AIA_BUNDLES[host] = path
+    return path
+
+
+HTTP_TIMEOUT_SHORT = 20
+
+
 class Fetcher:
     """Polite HTTP client: contact UA, per-source request budget, retries, robots.txt."""
 
@@ -153,7 +214,14 @@ class Fetcher:
                 raise RuntimeError(f"request budget exhausted for {source_id}")
             self.counts[source_id] = n + 1
             try:
-                r = self.session.get(url, params=params, timeout=config.HTTP_TIMEOUT)
+                try:
+                    r = self.session.get(url, params=params, timeout=config.HTTP_TIMEOUT)
+                except requests.exceptions.SSLError:
+                    from urllib.parse import urlsplit
+                    bundle = aia_bundle(urlsplit(url).hostname or "")
+                    if not bundle:
+                        raise
+                    r = self.session.get(url, params=params, timeout=config.HTTP_TIMEOUT, verify=bundle)
                 if r.status_code in (429, 500, 502, 503, 504):
                     raise requests.HTTPError(f"HTTP {r.status_code}", response=r)
                 r.raise_for_status()
