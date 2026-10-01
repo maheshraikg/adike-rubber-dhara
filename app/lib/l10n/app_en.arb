@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Adike–Rubber Dhara",
+  "appTitle": "Adike Rubber Rates",
   "navToday": "Today",
   "navCompare": "Compare",
   "navCalculator": "Calculator",
@@ -237,5 +237,5 @@
   "aliasesJson": "Alias maps (JSON)",
   "savedOk": "Saved",
   "invalidJson": "Invalid JSON",
-  "shareText": "Today's arecanut & rubber rates — Adike–Rubber Dhara app"
+  "shareText": "Today's arecanut & rubber rates — Adike Rubber Rates app"
 }

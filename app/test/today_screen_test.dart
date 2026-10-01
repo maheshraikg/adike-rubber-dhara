@@ -53,7 +53,7 @@ void main() {
     await offline.refresh();
     await tester.pumpWidget(AdikeApp(state: offline, adminOnly: false));
     await tester.pumpAndSettle();
-    expect(find.text('Adike–Rubber Dhara'), findsWidgets);
+    expect(find.text('Adike Rubber Rates'), findsWidgets);
     expect(find.textContaining('Offline'), findsOneWidget);
     expect(find.text('₹45,000'), findsOneWidget);
   });
