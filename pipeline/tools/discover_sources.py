@@ -57,6 +57,10 @@ def visit(s: requests.Session, url: str) -> tuple[int, str, BeautifulSoup | None
     except requests.RequestException as e:
         return 0, str(e)[:120], None, url
     ctype = r.headers.get("content-type", "")
+    if "xml" in ctype and "html" not in ctype:
+        print(f"      xml ({len(r.text)} chars) from {r.url}:")
+        for ln in r.text[:4000].splitlines():
+            print(f"      | {ln}")
     if "html" not in ctype:
         return r.status_code, ctype, None, r.url
     soup = BeautifulSoup(r.text, "html.parser")
