@@ -20,7 +20,8 @@ from adike_pipeline import config
 from adike_pipeline.util import aia_bundle
 
 START = {
-    "rubberboard": ["https://rubberboard.gov.in/public", "https://rubberboard.gov.in/",
+    "rubberboard": ["https://rubberboard.gov.in/rss_indianprice?type=latest",
+                    "https://rubberboard.gov.in/public", "https://rubberboard.gov.in/",
                     "https://rubberboard.gov.in/public/rubber-price",
                     "https://rubberboard.gov.in/public/price"],
     "krishimaratavahini": ["https://krishimaratavahini.kar.nic.in/",
@@ -57,7 +58,12 @@ def visit(s: requests.Session, url: str) -> tuple[int, str, BeautifulSoup | None
     except requests.RequestException as e:
         return 0, str(e)[:120], None, url
     ctype = r.headers.get("content-type", "")
-    if "xml" in ctype and "html" not in ctype:
+    if "rss_" in r.url:
+        print(f"      raw ({ctype}, {len(r.text)} chars) from {r.url}:")
+        for ln in r.text[:6000].splitlines():
+            if ln.strip():
+                print(f"      | {ln.rstrip()[:200]}")
+    elif "xml" in ctype and "html" not in ctype:
         print(f"      xml ({len(r.text)} chars) from {r.url}:")
         for ln in r.text[:4000].splitlines():
             print(f"      | {ln}")
@@ -103,7 +109,7 @@ def main() -> None:
                             if a['href'].lower().endswith('.pdf')][:3]
                     for p in pdfs:
                         print(f"      pdf: {p}")
-            if links:
+            if links and "rss_" not in start:
                 break  # first working start page is enough
 
 
