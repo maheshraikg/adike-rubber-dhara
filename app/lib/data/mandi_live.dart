@@ -73,6 +73,92 @@ class MandiLive {
     return const [];
   }
 
+  static const historyUrl = 'https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24';
+
+  /// Filter spellings for the history dataset (capitalised field names), with a
+  /// lowercase fallback; date as dd/mm/yyyy, then yyyy-mm-dd.
+  static const _histStyles = [('State', 'Commodity', 'Arrival_Date'), ('state', 'commodity', 'arrival_date')];
+
+  static String historyPageUrl(String state, String commodity, String date, int offset, int style) {
+    final (fs, fc, fd) = _histStyles[style];
+    return Uri.parse(historyUrl).replace(queryParameters: {
+      'api-key': sampleKey,
+      'format': 'json',
+      'limit': '$pageSize',
+      'offset': '$offset',
+      'filters[$fs]': state,
+      'filters[$fc]': commodity,
+      'filters[$fd]': date,
+    }).toString();
+  }
+
+  static String _dmy(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+  static String _ymd(DateTime d) => d.toIso8601String().substring(0, 10);
+
+  Future<List<Map<String, dynamic>>> _dayRecords(String state, String commodity, String date, int style, Duration maxAge) async {
+    final out = <Map<String, dynamic>>[];
+    for (var page = 0; page < maxPages; page++) {
+      final r = await http.get(historyPageUrl(state, commodity, date, page * pageSize, style),
+          maxAge: maxAge, timeout: const Duration(seconds: 20));
+      final data = jsonDecode(r.body) as Map<String, dynamic>;
+      final recs = ((data['records'] ?? []) as List).cast<Map<String, dynamic>>();
+      out.addAll(recs);
+      final total = int.tryParse('${data['total'] ?? 0}') ?? 0;
+      if (recs.length < pageSize || out.length >= total) break;
+    }
+    return out;
+  }
+
+  /// Last [days] days of prices for one market, by variety, from data.gov.in's
+  /// variety-wise history dataset (plus the current dataset). Past days are
+  /// cached for 12 h, today for 30 min. Empty when unreachable.
+  Future<Map<String, List<HistPoint>>> history(String crop, String marketId, Map<String, Market> markets,
+      Map<String, Variety> varieties, {int days = 7, DateTime? now}) async {
+    final n = now ?? DateTime.now();
+    final today = DateTime(n.year, n.month, n.day);
+    final m = NameMatcher(markets.values, varieties.values);
+    final rows = <PriceRow>[];
+    for (final q in queries.where((q) => q.crop == crop)) {
+      // find the filter spelling + date format that this dataset answers to
+      (int, String Function(DateTime))? fmt;
+      for (var back = 0; back < days && fmt == null; back++) {
+        final d = today.subtract(Duration(days: back));
+        for (final style in [0, 1]) {
+          for (final f in [_dmy, _ymd]) {
+            if (fmt != null) break;
+            try {
+              final recs = await _dayRecords(q.state, q.commodity, f(d), style,
+                  back == 0 ? const Duration(minutes: 30) : const Duration(hours: 12));
+              if (recs.isNotEmpty) {
+                fmt = (style, f);
+                rows.addAll(parseRecords(recs, crop, m, now: n, newestOnly: false));
+              }
+            } catch (_) {}
+          }
+        }
+        if (fmt == null && back >= 2) break; // nothing for 3 days in any spelling: give up
+      }
+      if (fmt == null) continue;
+      final (style, f) = fmt;
+      for (var back = 0; back < days; back++) {
+        final d = today.subtract(Duration(days: back));
+        if (rows.any((r) => r.date == _ymd(d))) continue; // already fetched while probing
+        try {
+          final recs = await _dayRecords(q.state, q.commodity, f(d), style,
+              back == 0 ? const Duration(minutes: 30) : const Duration(hours: 12));
+          rows.addAll(parseRecords(recs, crop, m, now: n, newestOnly: false));
+        } catch (_) {}
+      }
+    }
+    try {
+      for (final q in queries.where((q) => q.crop == crop)) {
+        rows.addAll(parseRecords(await _records(q.state, q.commodity), crop, m, now: n, newestOnly: false));
+      }
+    } catch (_) {}
+    return historyByVariety(rows.where((r) => r.marketId == marketId));
+  }
+
   /// Fetch and parse every query. Failures of one query don't stop the others.
   Future<List<PriceRow>> fetch(Map<String, Market> markets, Map<String, Variety> varieties, {DateTime? now}) async {
     final rows = <PriceRow>[];
@@ -142,6 +228,16 @@ class NameMatcher {
   }
 }
 
+/// Field lookup across both datasets: current uses `min_price`, the history
+/// dataset `Min_x0020_Price` / `Arrival_Date`.
+dynamic _field(Map<String, dynamic> rec, String name) {
+  if (rec.containsKey(name)) return rec[name];
+  for (final e in rec.entries) {
+    if (e.key.toLowerCase().replaceAll('_x0020_', '_') == name) return e.value;
+  }
+  return null;
+}
+
 double? _num(dynamic v) {
   if (v == null) return null;
   final s = v.toString().replaceAll(',', '').trim();
@@ -159,25 +255,29 @@ String? _isoDate(dynamic v) {
 /// Same sanity ranges as the pipeline (config.DEFAULT_VALIDATION).
 const _range = {'arecanut': (5000.0, 150000.0), 'rubber': (50.0, 500.0)};
 
-List<PriceRow> parseRecords(List<Map<String, dynamic>> records, String crop, NameMatcher m, {required DateTime now}) {
+/// [newestOnly]: one row per market+variety (Today); otherwise one per day (history).
+List<PriceRow> parseRecords(List<Map<String, dynamic>> records, String crop, NameMatcher m,
+    {required DateTime now, bool newestOnly = true}) {
   final out = <String, PriceRow>{};
   final today = DateTime(now.year, now.month, now.day);
   for (final rec in records) {
-    final market = m.market(rec['market'] as String?);
-    var vraw = (rec['variety'] ?? '').toString();
-    final grade = (rec['grade'] ?? '').toString().trim();
+    final market = m.market(_field(rec, 'market')?.toString());
+    var vraw = (_field(rec, 'variety') ?? '').toString();
+    final grade = (_field(rec, 'grade') ?? '').toString().trim();
     if (grade.isNotEmpty && !['FAQ', 'NON-FAQ', 'LOCAL'].contains(grade.toUpperCase())) {
       vraw = '$vraw $grade'.trim();
     }
     final variety = m.variety(crop, vraw);
-    final date = _isoDate(rec['arrival_date']);
+    final date = _isoDate(_field(rec, 'arrival_date'));
     if (market == null || variety == null || date == null) continue;
     final d = DateTime.parse(date);
     if (d.isAfter(today) || today.difference(d).inDays > 7) continue; // future / stale
 
     final f = crop == 'rubber' ? 0.01 : 1.0; // data.gov.in quotes ₹/quintal
     double? conv(double? x) => x == null ? null : (x * f * 100).roundToDouble() / 100;
-    final min = conv(_num(rec['min_price'])), max = conv(_num(rec['max_price'])), modal = conv(_num(rec['modal_price']));
+    final min = conv(_num(_field(rec, 'min_price')));
+    final max = conv(_num(_field(rec, 'max_price')));
+    final modal = conv(_num(_field(rec, 'modal_price')));
     if (modal == null) continue;
     if (min != null && max != null && min > max) continue;
     if ((min != null && modal < min) || (max != null && modal > max)) continue;
@@ -199,8 +299,9 @@ List<PriceRow> parseRecords(List<Map<String, dynamic>> records, String crop, Nam
       max: max,
       modal: modal,
     );
-    final prev = out['$market|$variety'];
-    if (prev == null || prev.date.compareTo(date) < 0) out['$market|$variety'] = row; // newest per market+variety
+    final key = newestOnly ? '$market|$variety' : '$market|$variety|$date';
+    final prev = out[key];
+    if (prev == null || prev.date.compareTo(date) < 0) out[key] = row; // newest per market+variety
   }
   return out.values.toList();
 }
@@ -219,4 +320,18 @@ List<PriceRow> mergeLive(List<PriceRow> published, List<PriceRow> live) {
     for (final r in live)
       if ((newest['${r.crop}|${r.marketId}|${r.variety}'] ?? '').compareTo(r.date) < 0) r,
   ];
+}
+
+/// Rows → chart points per variety, one point per day (sorted, duplicates dropped).
+Map<String, List<HistPoint>> historyByVariety(Iterable<PriceRow> rows) {
+  final byKey = <String, Map<String, PriceRow>>{};
+  for (final r in rows) {
+    (byKey[r.variety] ??= {})[r.date] = r;
+  }
+  return {
+    for (final e in byKey.entries)
+      e.key: (e.value.values.toList()..sort((a, b) => a.date.compareTo(b.date)))
+          .map((r) => HistPoint(DateTime.parse(r.date), r.min, r.max, r.modal))
+          .toList(),
+  };
 }
