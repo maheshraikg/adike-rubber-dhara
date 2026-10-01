@@ -30,6 +30,7 @@ _NUM = r"\d[\d,]*(?:\.\d+)?"
 _ROW_RX = re.compile(rf"^\s*(?P<grade>{_GRADE})\s*\n\s*(?P<inr>{_NUM})\s*\n\s*(?P<usd>{_NUM})\s*$",
                      re.I | re.M)
 _DATE_RX = re.compile(r"\b(\d{1,2}[./-]\d{1,2}[./-]\d{4}|\d{4}-\d{2}-\d{2})\b")
+_MAX_HEADER_GAP = 120  # characters of column-header text allowed between two tables
 _PER_100 = re.compile(r"100\s*(?:kg|कि|ಕೆ)", re.I)
 
 # market tab labels as printed (en / hi / ml / kn) -> market id in data/markets.json.
@@ -85,7 +86,14 @@ def parse_text(text: str, collected_time: str, url: str) -> list[RawRow]:
     page_date = dates[-1] if dates else None  # the last date before the tables is the box's own
 
     tables: list[list[re.Match]] = [[]]
+    prev = None
     for m in rows_m:
+        # Tables inside the box are separated only by their column headers
+        # (Grade / Indian Rupees ₹ / US Dollar $). More text in between means the
+        # daily box has ended (later tables are averages etc.): stop there.
+        if prev is not None and len(text[prev.end(): m.start()].strip()) > _MAX_HEADER_GAP:
+            break
+        prev = m
         names = {_grade_name(x.group("grade")) for x in tables[-1]}
         if _grade_name(m.group("grade")) in names:
             tables.append([])
