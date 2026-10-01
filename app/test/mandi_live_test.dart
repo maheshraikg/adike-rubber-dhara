@@ -98,4 +98,38 @@ void main() {
     expect(arecanutCalls.every((u) => u.queryParameters['api-key'] == MandiLive.sampleKey && u.queryParameters['limit'] == '10'), isTrue);
     expect(rows.where((r) => r.crop == 'arecanut').length, greaterThanOrEqualTo(10));
   });
+
+  test('7-day history: history dataset fields, one point per day for the market', () async {
+    SharedPreferences.setMockInitialValues({});
+    final p = await SharedPreferences.getInstance();
+    final today = DateTime(2026, 9, 30);
+    String dmy(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+    final client = MockClient((req) async {
+      final qp = req.url.queryParameters;
+      if (!req.url.path.contains('35985678')) return http.Response(jsonEncode({'total': 0, 'records': []}), 200);
+      final date = qp['filters[Arrival_Date]'];
+      if (date == null || qp['filters[Commodity]'] != 'Arecanut(Betelnut/Supari)') {
+        return http.Response(jsonEncode({'total': 0, 'records': []}), 200);
+      }
+      final back = [for (var i = 0; i < 7; i++) dmy(today.subtract(Duration(days: i)))].indexOf(date);
+      if (back < 0 || back == 1) return http.Response(jsonEncode({'total': 0, 'records': []}), 200); // a holiday
+      final modal = 52000 + back * 100;
+      final recs = [
+        {'State': 'Karnataka', 'Market': 'Shimoga', 'Commodity': 'Arecanut(Betelnut/Supari)', 'Variety': 'Rashi',
+         'Grade': 'FAQ', 'Arrival_Date': date, 'Min_x0020_Price': '${modal - 1000}', 'Max_x0020_Price': '${modal + 1000}',
+         'Modal_x0020_Price': '$modal'},
+        {'State': 'Karnataka', 'Market': 'Sagar', 'Commodity': 'Arecanut(Betelnut/Supari)', 'Variety': 'Rashi',
+         'Grade': 'FAQ', 'Arrival_Date': date, 'Min_x0020_Price': '50000', 'Max_x0020_Price': '52000',
+         'Modal_x0020_Price': '51000'},
+      ];
+      return http.Response(jsonEncode({'total': recs.length, 'records': recs}), 200);
+    });
+    final h = await MandiLive(CachedHttp(client, p)).history('arecanut', 'shivamogga', markets, varieties, now: today);
+    final pts = h['rashi']!;
+    expect(pts, hasLength(6)); // 7 days minus the holiday; Sagar rows excluded
+    expect(pts.first.date, today.subtract(const Duration(days: 6)));
+    expect(pts.last.date, today);
+    expect(pts.last.modal, 52000.0);
+    expect(pts.first.min, 51600.0); // 6 days back: modal 52600, min 51600
+  });
 }

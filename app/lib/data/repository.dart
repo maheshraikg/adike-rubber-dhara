@@ -101,6 +101,20 @@ class PriceRepository {
   /// Live mandi rows read on the phone from data.gov.in ([] when unreachable).
   Future<List<PriceRow>> liveMandi(PriceData d) => MandiLive(http).fetch(d.markets, d.varieties);
 
+  /// Published history plus, for live data.gov.in rows, the last 7 days read on
+  /// the phone (series `datagov_live|variety`).
+  Future<History> historyWithLive(String crop, String marketId, PriceData? d) async {
+    final h = await history(crop, marketId);
+    if (d == null) return h;
+    try {
+      final live = await MandiLive(http).history(crop, marketId, d.markets, d.varieties);
+      if (live.isEmpty) return h;
+      return History({...h.series, for (final e in live.entries) '${MandiLive.sourceId}|${e.key}': e.value});
+    } catch (_) {
+      return h;
+    }
+  }
+
   Future<History> history(String crop, String marketId) async {
     try {
       final r = await http.get(url('history/$crop/$marketId.json'), maxAge: const Duration(minutes: 30));

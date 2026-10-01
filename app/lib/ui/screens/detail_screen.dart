@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../l10n/gen/app_localizations.dart';
+import '../../data/mandi_live.dart';
 import '../../models/models.dart';
 import '../app_state.dart';
 import '../widgets/badges.dart';
@@ -39,13 +40,19 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   History? history;
-  ChartRange range = ChartRange.m1;
+  // live data.gov.in rows only have the last 7 days
+  late ChartRange range = widget.row.sourceId == MandiLive.sourceId ? ChartRange.d7 : ChartRange.m1;
   bool season = false;
 
   @override
   void initState() {
     super.initState();
-    AppScope.read(context).repo.history(widget.row.crop, widget.row.marketId).then((h) {
+    final s = AppScope.read(context);
+    final r = widget.row;
+    final load = r.sourceId == MandiLive.sourceId
+        ? s.repo.historyWithLive(r.crop, r.marketId, s.data)
+        : s.repo.history(r.crop, r.marketId);
+    load.then((h) {
       if (mounted) setState(() => history = h);
     });
   }
