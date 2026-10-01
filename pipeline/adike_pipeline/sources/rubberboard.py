@@ -9,9 +9,10 @@ from __future__ import annotations
 import re
 from typing import Optional
 
+from bs4 import BeautifulSoup
+
 from ..models import RawRow
 from ..util import Fetcher, log_event, parse_date
-from .web import html_to_text
 
 SOURCE_ID = "rubberboard_daily"
 
@@ -23,6 +24,16 @@ _GRADE_RX = re.compile(
 )
 _RUPEE_RX = re.compile(r"₹|indian\s+rupees?|rupees|रुपये|ರೂಪಾಯಿ", re.I)
 _DATE_RX = re.compile(r"\b(\d{1,2}[./-]\d{1,2}[./-]\d{4}|\d{4}-\d{2}-\d{2}|\d{1,2}[ -][A-Za-z]{3}[ -]\d{4})\b")
+
+
+def page_text(html: str) -> str:
+    """Visible text in document order. Unlike web.html_to_text this keeps header/
+    footer blocks and does not move tables first, so the rupee label stays next to
+    its figures."""
+    soup = BeautifulSoup(html, "html.parser")
+    for t in soup(["script", "style", "noscript"]):
+        t.decompose()
+    return re.sub(r"\n{3,}", "\n\n", soup.get_text("\n", strip=True))
 
 
 def _grade_name(g: str) -> str:
@@ -43,6 +54,18 @@ def _page_date(text: str, start: int, end: int) -> Optional[str]:
     return None
 
 
+def _grades(text: str, offset: int) -> dict[str, tuple[float, int, int]]:
+    found: dict[str, tuple[float, int, int]] = {}
+    for g in _GRADE_RX.finditer(text, offset):
+        name = _grade_name(g.group("grade"))
+        if name in found:
+            continue
+        found[name] = (float(g.group("value").replace(",", "")), g.start(), g.end())
+        if len(found) == 4:
+            break
+    return found
+
+
 def parse_text(text: str, collected_time: str, url: str) -> list[RawRow]:
     """Rows for the first RSS-4/RSS-5/ISNR-20/Latex figures after the rupee marker.
 
@@ -52,19 +75,11 @@ def parse_text(text: str, collected_time: str, url: str) -> list[RawRow]:
     m = _RUPEE_RX.search(text)
     if not m:
         return []
-    body = text[m.start():]
-    found: dict[str, tuple[float, int, int]] = {}
-    for g in _GRADE_RX.finditer(body):
-        name = _grade_name(g.group("grade"))
-        if name in found:
-            continue
-        found[name] = (float(g.group("value").replace(",", "")), g.start(), g.end())
-        if len(found) == 4:
-            break
+    found = _grades(text, m.start())
     if not found:
         return []
-    start = min(s for _, s, _ in found.values()) + m.start()
-    end = max(e for _, _, e in found.values()) + m.start()
+    start = min(s for _, s, _ in found.values())
+    end = max(e for _, _, e in found.values())
     page_date = _page_date(text, start, end)
     excerpt = text[max(0, start - 120): end + 120]
     rows = []
@@ -84,7 +99,7 @@ def parse_text(text: str, collected_time: str, url: str) -> list[RawRow]:
 def collect(fetcher: Fetcher, source: dict, collected_time: str) -> tuple[list[RawRow], str]:
     url = source["url"]
     r = fetcher.get(SOURCE_ID, url)
-    text = html_to_text(r.text)
+    text = page_text(r.text)
     rows = parse_text(text, collected_time, url)
     log_event("rubberboard.parsed", rows=len(rows), dated=bool(rows and rows[0].note is None))
     return rows, text

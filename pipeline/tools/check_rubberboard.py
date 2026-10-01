@@ -18,7 +18,11 @@ def main() -> None:
     for r in rows:
         print(json.dumps(r.model_dump(exclude={"rawExcerpt"}), ensure_ascii=False))
     print("--- text around the rate box ---")
-    print(rows[0].rawExcerpt if rows else text[:1500])
+    if rows:
+        print(rows[0].rawExcerpt)
+    else:
+        for i in [m.start() for m in __import__("re").finditer(r"RSS|ISNR|Latex|₹|Rupee", text, 2)][:6]:
+            print("...", text[max(0, i - 200): i + 300].replace("\n", " | "))
     if not rows:
         raise SystemExit("rate box not found")
 
