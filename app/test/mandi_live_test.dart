@@ -132,4 +132,29 @@ void main() {
     expect(pts.last.modal, 52000.0);
     expect(pts.first.min, 51600.0); // 6 days back: modal 52600, min 51600
   });
+
+  test('falls back to case-sensitive State/Commodity filters and logs what happened', () async {
+    SharedPreferences.setMockInitialValues({});
+    final p = await SharedPreferences.getInstance();
+    final t = DateTime.now();
+    final d = '${t.day.toString().padLeft(2, '0')}/${t.month.toString().padLeft(2, '0')}/${t.year}';
+    final client = MockClient((req) async {
+      final qp = req.url.queryParameters;
+      if (qp['filters[Commodity]'] == 'Arecanut(Betelnut/Supari)' && qp['filters[State]'] == 'Karnataka') {
+        final recs = [
+          rec('Shimoga', 'Rashi', '50000', '53500', '52500', date: d),
+          rec('Hunsur', 'Rashi', '50000', '53500', '52500', date: d),
+        ];
+        return http.Response(jsonEncode({'total': recs.length, 'records': recs}), 200);
+      }
+      return http.Response(jsonEncode({'total': 0, 'records': []}), 200);
+    });
+    final live = MandiLive(CachedHttp(client, p));
+    final rows = await live.fetch(markets, varieties);
+    expect(rows.single.marketId, 'shivamogga');
+    expect(live.log.join('\n'), contains('2 records (State)'));
+    expect(live.log.join('\n'), contains('market:Hunsur×1'));
+    expect(live.log.join('\n'), contains('Kerala/Rubber: 0 records'));
+  });
 }
+

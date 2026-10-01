@@ -51,14 +51,20 @@ class AppState extends ChangeNotifier {
   Future<void> _addLiveMandi() async {
     final base = data;
     if (base == null) return;
+    liveStatus = const ['data.gov.in: …'];
+    notifyListeners();
     try {
-      final live = await repo.liveMandi(base);
-      if (identical(data, base) && live.isNotEmpty) {
-        data = base.withLive(live);
-        notifyListeners();
-      }
-    } catch (_) {}
+      final (live, log) = await repo.liveMandi(base);
+      liveStatus = ['data.gov.in:', ...log];
+      if (identical(data, base) && live.isNotEmpty) data = base.withLive(live);
+    } catch (e) {
+      liveStatus = ['data.gov.in: $e'];
+    }
+    notifyListeners();
   }
+
+  /// Outcome of the last phone-side data.gov.in fetch (shown small on Today).
+  List<String> liveStatus = const [];
 
   Future<void> setCrop(String c) async {
     crop = c;

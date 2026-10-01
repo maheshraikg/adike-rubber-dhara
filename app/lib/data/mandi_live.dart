@@ -41,36 +41,58 @@ class MandiLive {
   final CachedHttp http;
   MandiLive(this.http);
 
-  static String pageUrl(String state, String commodity, int offset, {required bool keyword}) {
-    final f = keyword ? '.keyword' : '';
+  /// Filter spellings for the current dataset. Guides disagree (`state.keyword`,
+  /// case-sensitive `State`, plain `state`), so each is tried in turn.
+  static const filterStyles = [('state.keyword', 'commodity.keyword'), ('State', 'Commodity'), ('state', 'commodity')];
+
+  static String pageUrl(String state, String commodity, int offset, {int style = 0}) {
+    final (fs, fc) = filterStyles[style];
     final q = {
       'api-key': sampleKey,
       'format': 'json',
       'limit': '$pageSize',
       'offset': '$offset',
-      'filters[state$f]': state,
-      'filters[commodity$f]': commodity,
+      'filters[$fs]': state,
+      'filters[$fc]': commodity,
     };
     return Uri.parse(resourceUrl).replace(queryParameters: q).toString();
   }
 
-  /// All records for one query. Tries `filters[x.keyword]`, then plain `filters[x]`
-  /// (data.gov.in accepts one or the other depending on the dataset).
+  /// What happened on the last fetch, one line per query (shown in the app so a
+  /// screenshot tells what data.gov.in answered).
+  final List<String> log = [];
+
+  /// All records for one query, using the first filter spelling that returns any.
   Future<List<Map<String, dynamic>>> _records(String state, String commodity) async {
-    for (final keyword in [true, false]) {
+    Object? lastError;
+    for (var style = 0; style < filterStyles.length; style++) {
       final out = <Map<String, dynamic>>[];
-      for (var page = 0; page < maxPages; page++) {
-        final r = await http.get(pageUrl(state, commodity, page * pageSize, keyword: keyword),
-            maxAge: const Duration(minutes: 30), timeout: const Duration(seconds: 20));
-        final data = jsonDecode(r.body) as Map<String, dynamic>;
-        final recs = ((data['records'] ?? []) as List).cast<Map<String, dynamic>>();
-        out.addAll(recs);
-        final total = int.tryParse('${data['total'] ?? 0}') ?? 0;
-        if (recs.length < pageSize || out.length >= total) break;
+      try {
+        for (var page = 0; page < maxPages; page++) {
+          final r = await http.get(pageUrl(state, commodity, page * pageSize, style: style),
+              maxAge: const Duration(minutes: 30), timeout: const Duration(seconds: 20));
+          final data = jsonDecode(r.body) as Map<String, dynamic>;
+          final recs = ((data['records'] ?? []) as List).cast<Map<String, dynamic>>();
+          out.addAll(recs);
+          final total = int.tryParse('${data['total'] ?? 0}') ?? 0;
+          if (recs.length < pageSize || out.length >= total) break;
+        }
+      } catch (e) {
+        lastError = e;
+        continue;
       }
-      if (out.isNotEmpty) return out;
+      if (out.isNotEmpty) {
+        log.add('$state/$commodity: ${out.length} records (${filterStyles[style].$1})');
+        return out;
+      }
     }
+    log.add('$state/$commodity: 0 records${lastError == null ? '' : ' — ${_short(lastError)}'}');
     return const [];
+  }
+
+  static String _short(Object e) {
+    final s = e.toString().replaceAll(RegExp(r'api-key=[^&\s]+'), 'api-key=…');
+    return s.length > 120 ? '${s.substring(0, 120)}…' : s;
   }
 
   static const historyUrl = 'https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24';
@@ -165,9 +187,16 @@ class MandiLive {
     final m = NameMatcher(markets.values, varieties.values);
     for (final q in queries) {
       try {
-        rows.addAll(parseRecords(await _records(q.state, q.commodity), q.crop, m, now: now ?? DateTime.now()));
-      } catch (_) {
-        // offline / data.gov.in down: published prices still show
+        final recs = await _records(q.state, q.commodity);
+        final dropped = <String, int>{};
+        final parsed = parseRecords(recs, q.crop, m, now: now ?? DateTime.now(), dropped: dropped);
+        if (recs.isNotEmpty) {
+          final top = (dropped.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).take(4);
+          log.add('  → ${parsed.length} shown${top.isEmpty ? '' : '; skipped ${top.map((e) => '${e.key}×${e.value}').join(', ')}'}');
+        }
+        rows.addAll(parsed);
+      } catch (e) {
+        log.add('${q.state}/${q.commodity}: ${_short(e)}');
       }
     }
     return rows;
@@ -256,8 +285,10 @@ String? _isoDate(dynamic v) {
 const _range = {'arecanut': (5000.0, 150000.0), 'rubber': (50.0, 500.0)};
 
 /// [newestOnly]: one row per market+variety (Today); otherwise one per day (history).
+/// [dropped] (optional) counts why records were skipped, e.g. "market:Hunsur".
 List<PriceRow> parseRecords(List<Map<String, dynamic>> records, String crop, NameMatcher m,
-    {required DateTime now, bool newestOnly = true}) {
+    {required DateTime now, bool newestOnly = true, Map<String, int>? dropped}) {
+  void skip(String why) => dropped == null ? null : dropped[why] = (dropped[why] ?? 0) + 1;
   final out = <String, PriceRow>{};
   final today = DateTime(now.year, now.month, now.day);
   for (final rec in records) {
@@ -269,20 +300,39 @@ List<PriceRow> parseRecords(List<Map<String, dynamic>> records, String crop, Nam
     }
     final variety = m.variety(crop, vraw);
     final date = _isoDate(_field(rec, 'arrival_date'));
-    if (market == null || variety == null || date == null) continue;
+    if (market == null) {
+      skip('market:${_field(rec, 'market')}');
+      continue;
+    }
+    if (variety == null) {
+      skip('variety:$vraw');
+      continue;
+    }
+    if (date == null) {
+      skip('date:${_field(rec, 'arrival_date')}');
+      continue;
+    }
     final d = DateTime.parse(date);
-    if (d.isAfter(today) || today.difference(d).inDays > 7) continue; // future / stale
+    if (d.isAfter(today) || today.difference(d).inDays > 7) {
+      skip('old/future date');
+      continue;
+    }
 
     final f = crop == 'rubber' ? 0.01 : 1.0; // data.gov.in quotes ₹/quintal
     double? conv(double? x) => x == null ? null : (x * f * 100).roundToDouble() / 100;
     final min = conv(_num(_field(rec, 'min_price')));
     final max = conv(_num(_field(rec, 'max_price')));
     final modal = conv(_num(_field(rec, 'modal_price')));
-    if (modal == null) continue;
-    if (min != null && max != null && min > max) continue;
-    if ((min != null && modal < min) || (max != null && modal > max)) continue;
     final (lo, hi) = _range[crop]!;
-    if (modal < lo || modal > hi) continue;
+    if (modal == null ||
+        (min != null && max != null && min > max) ||
+        (min != null && modal < min) ||
+        (max != null && modal > max) ||
+        modal < lo ||
+        modal > hi) {
+      skip('failed price checks');
+      continue;
+    }
 
     final v = m.varieties[variety]!;
     final row = PriceRow(

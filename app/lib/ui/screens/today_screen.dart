@@ -157,6 +157,13 @@ class TodayScreen extends StatelessWidget {
               if (i == favCount && groups.length > favCount) _Header(t.otherMarkets, icon: Icons.storefront_outlined),
               _MarketCard(marketId: groups[i].key, rows: groups[i].value),
             ],
+            if (s.liveStatus.isNotEmpty)
+              Padding(
+                key: const ValueKey('live_status'),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Text(s.liveStatus.join('\n'),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
+              ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(t.disclaimer, style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),

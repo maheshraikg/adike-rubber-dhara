@@ -99,7 +99,11 @@ class PriceRepository {
   }
 
   /// Live mandi rows read on the phone from data.gov.in ([] when unreachable).
-  Future<List<PriceRow>> liveMandi(PriceData d) => MandiLive(http).fetch(d.markets, d.varieties);
+  Future<(List<PriceRow>, List<String>)> liveMandi(PriceData d) async {
+    final live = MandiLive(http);
+    final rows = await live.fetch(d.markets, d.varieties);
+    return (rows, live.log);
+  }
 
   /// Published history plus, for live data.gov.in rows, the last 7 days read on
   /// the phone (series `datagov_live|variety`).
