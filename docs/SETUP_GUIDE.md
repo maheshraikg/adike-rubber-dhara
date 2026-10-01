@@ -156,8 +156,8 @@ then add SHA-256 the same way. Get them with
 `keytool -list -v -keystore adike-release.jks -alias adike` (or from Claude in E1).
 
 **E3. Build the APK** — Actions → *Adike – release APK + admin web* → **Run workflow**.
-Wait for the green tick (≈ 8 min). Open the run → **Artifacts** → `adike-dhara-release-apk` →
-download the zip → inside is `app-release.apk`.
+Wait for the green tick (≈ 8 min). Download link (always the newest build, no login, no zip):
+<https://github.com/maheshraikg/adike-rubber-dhara/releases/latest/download/adike-dhara.apk>
 The same run also publishes the admin console.
 
 **E4. Install on a phone** — send the APK to your phone (WhatsApp to yourself works) → tap it →
@@ -181,7 +181,7 @@ First launch: choose your markets → the Today screen shows prices.
 - **Add a co-operative/trader partner:** see [PARTNER_ONBOARDING.md](PARTNER_ONBOARDING.md)
   (they apply in the app → you approve in Partners and set a source id).
 - **Run now:** admin console → Runs → *Run collection now*, or Actions → *Adike – collect prices*.
-- **Share the app:** forward the APK on WhatsApp. For a new version, run E3 again and share the new APK
+- **Share the app:** send the download link above (or forward the APK) on WhatsApp. For a new version, run E3 again and share the new APK
   (same signing key → it installs as an update).
 - **Optional Play Store:** one-time USD 25; listing text is in [PLAY_STORE.md](PLAY_STORE.md).
 

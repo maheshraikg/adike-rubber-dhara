@@ -77,11 +77,21 @@ jobs:
           name: adike-dhara-release-apk
           path: ${{ env.APP_DIR }}/app/build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Attach APK to a GitHub release (tags only)
-        if: startsWith(github.ref, 'refs/tags/')
+      # Direct download for farmers (no zip, no GitHub login):
+      # https://github.com/<owner>/<repo>/releases/latest/download/adike-dhara.apk
+      - name: Copy APK under a fixed name
+        run: cp build/app/outputs/flutter-apk/app-release.apk build/adike-dhara.apk
+
+      - name: Publish APK to the "latest" release (direct link)
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.APP_DIR }}/app/build/app/outputs/flutter-apk/app-release.apk
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'adike-app-latest' }}
+          name: Adike–Rubber Dhara app
+          body: |
+            Direct download: https://github.com/${{ github.repository }}/releases/latest/download/adike-dhara.apk
+            Built from ${{ github.sha }}.
+          make_latest: true
+          files: ${{ env.APP_DIR }}/app/build/adike-dhara.apk
 
       - name: Publish admin web to gh-pages/admin
         working-directory: ${{ github.workspace }}
