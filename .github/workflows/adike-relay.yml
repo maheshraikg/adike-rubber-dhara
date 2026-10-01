@@ -1,0 +1,75 @@
+# Deploys relay/ (Cloudflare Worker, free plan) that fetches data.gov.in for the
+# collection robot, because data.gov.in refuses GitHub's servers.
+# Needs secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, ADIKE_RELAY_TOKEN
+# (see docs/SETUP_GUIDE.md, section G). Prints the URL to save as the
+# ADIKE_RELAY_URL variable, and checks data.gov.in answers through it.
+name: Adike – deploy data.gov.in relay
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./relay
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      RELAY_TOKEN: ${{ secrets.ADIKE_RELAY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Test the relay
+        run: npm test
+
+      - name: Check secrets
+        id: secrets
+        run: |
+          missing=""
+          [ -n "$CLOUDFLARE_API_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          [ -n "$RELAY_TOKEN" ] || missing="$missing ADIKE_RELAY_TOKEN"
+          if [ -n "$missing" ]; then
+            echo "::notice::Relay not deployed. Missing secrets:$missing (docs/SETUP_GUIDE.md, section G)."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy
+        id: deploy
+        if: steps.secrets.outputs.ok == 'true'
+        run: |
+          npx --yes wrangler@4 deploy 2>&1 | tee deploy.log
+          url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          printf '%s' "$RELAY_TOKEN" | npx --yes wrangler@4 secret put RELAY_TOKEN
+
+      - name: Check data.gov.in through the relay
+        if: steps.secrets.outputs.ok == 'true'
+        env:
+          URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          echo "Relay URL: $URL"
+          sleep 10
+          code=$(curl -sS -o resp.json -w '%{http_code}' -G "$URL/resource/9ef84268-d588-465a-a308-a864a43d0070" \
+            -H "x-relay-token: $RELAY_TOKEN" \
+            --data-urlencode "api-key=579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b" \
+            --data-urlencode "format=json" --data-urlencode "limit=10" \
+            --data-urlencode "filters[state.keyword]=Karnataka" \
+            --data-urlencode "filters[commodity.keyword]=Arecanut(Betelnut/Supari)" || true)
+          echo "HTTP $code"
+          head -c 1500 resp.json; echo
+          if [ "$code" = "200" ]; then
+            echo "::notice::Relay works. Save this as repository variable ADIKE_RELAY_URL: $URL"
+          else
+            echo "::warning::data.gov.in did not answer through the relay (HTTP $code)."
+          fi

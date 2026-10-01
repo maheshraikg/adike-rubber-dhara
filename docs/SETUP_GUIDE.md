@@ -66,7 +66,10 @@ Keep a notes file open: several steps give you a value to copy into GitHub later
 
 ## B. Free API keys (≈ 5 min)
 
-**B1. data.gov.in** (official mandi prices)
+**B1. data.gov.in** (official mandi prices) — *optional*
+Without your own key the robot uses data.gov.in's public sample key (shown on every data.gov.in
+dataset page; 10 rows per request, so it pages through). Your own key is faster and has higher
+limits; add it when the login works:
 1. <https://data.gov.in> → **Login / Sign up** (email + OTP to your email).
 2. After login: your name (top right) → **My Account** → **Generate Key** (API key). Copy it → **DATA_GOV_IN_KEY**.
 
@@ -86,7 +89,7 @@ Open <https://github.com/maheshraikg/adike-rubber-dhara> → **Settings** → le
 
 | Name | Value |
 |---|---|
-| `DATA_GOV_IN_KEY` | from B1 |
+| `DATA_GOV_IN_KEY` | from B1 (optional; the public sample key is used without it) |
 | `GEMINI_API_KEY` | from B2 (skip if you have none) |
 | `FIREBASE_SERVICE_ACCOUNT` | open the JSON file from A8, copy **all** of it, paste |
 
@@ -181,6 +184,28 @@ First launch: choose your markets → the Today screen shows prices.
 - **Share the app:** forward the APK on WhatsApp. For a new version, run E3 again and share the new APK
   (same signing key → it installs as an update).
 - **Optional Play Store:** one-time USD 25; listing text is in [PLAY_STORE.md](PLAY_STORE.md).
+
+---
+
+## G. Arecanut mandi prices (data.gov.in)
+
+data.gov.in refuses connections from GitHub's servers, so the robot cannot read it directly.
+
+- **On phones (automatic):** the app reads data.gov.in itself (phones in India are not blocked)
+  with the public sample key and shows rows marked *data.gov.in, live*. Nothing to set up.
+- **For the robot (history, alerts, review queue): a free Cloudflare relay** (≈ 10 min, no card)
+  1. <https://dash.cloudflare.com/sign-up> → sign up with email (Free plan).
+  2. Account ID: Cloudflare home → **Workers & Pages** → right side *Account ID* → copy.
+  3. API token: top-right profile → **My Profile → API Tokens → Create Token** →
+     template **Edit Cloudflare Workers** → Continue → Create → copy the token.
+  4. GitHub → Settings → Secrets and variables → Actions → **New repository secret**, three times:
+     `CLOUDFLARE_ACCOUNT_ID` (step 2), `CLOUDFLARE_API_TOKEN` (step 3),
+     `ADIKE_RELAY_TOKEN` (any long random text — it is a password between robot and relay).
+  5. Actions → **Adike – deploy data.gov.in relay** → Run workflow. When green, open the run:
+     it prints the relay URL (`https://adike-datagov-relay.<name>.workers.dev`) and whether
+     data.gov.in answered.
+  6. If it answered: Variables tab → **New repository variable** `ADIKE_RELAY_URL` = that URL.
+     The next collection run uses it.
 
 ---
 

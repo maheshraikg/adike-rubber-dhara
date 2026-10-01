@@ -13,6 +13,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
+from . import config
 from .ai import AIProvider, AIUnavailable, make_provider
 from .alerts import send_admin_alert
 from .models import AIExtraction, PriceRow, RawRow
@@ -109,7 +110,9 @@ class Runner:
         self.cfg = merged_config(store.validation_config())
         self.ai = ai if ai is not None else make_provider(self.cfg)
         self.fetcher = fetcher or Fetcher()
-        self.api_fetcher = api_fetcher or Fetcher(max_per_source=40)
+        self.api_fetcher = api_fetcher or Fetcher(max_per_source=150)
+        if config.DATAGOV_RELAY_TOKEN:
+            self.api_fetcher.session.headers["x-relay-token"] = config.DATAGOV_RELAY_TOKEN
         self.datagov_key = datagov_key
         self.admin_alert = admin_alert
         self.publisher = Publisher(site, config_dir, self.today)
@@ -119,13 +122,12 @@ class Runner:
 
     # ---------------- collection ----------------
     def collect_datagov(self, src: dict) -> list[Item]:
-        if not self.datagov_key:
-            self.res.sources[src["id"]] = SourceResult(ok=False, error="DATA_GOV_IN_KEY not set")
-            return []
+        key = self.datagov_key or config.DATAGOV_SAMPLE_KEY
         try:
-            rows, dump = datagov.collect(self.api_fetcher, self.datagov_key, self.tstamp)
+            rows, dump = datagov.collect(self.api_fetcher, key, self.tstamp)
             self.publisher.save_raw(src["id"], "json", json.dumps(dump, ensure_ascii=False))
-            self.res.sources[src["id"]] = SourceResult(rows=len(rows))
+            self.res.sources[src["id"]] = SourceResult(
+                rows=len(rows), note=None if self.datagov_key else "public sample key (10 rows per request)")
             return [Item(r, src) for r in rows]
         except Exception as e:  # noqa: BLE001
             self.res.sources[src["id"]] = SourceResult(ok=False, error=str(e)[:300])

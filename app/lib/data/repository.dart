@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../config.dart';
 import '../models/models.dart';
 import 'cached_http.dart';
+import 'mandi_live.dart';
 
 class PriceData {
   final Latest latest;
@@ -19,6 +20,24 @@ class PriceData {
     required this.offline,
     required this.fetchedAt,
   });
+
+  /// Copy with live data.gov.in rows added (see mandi_live.dart).
+  PriceData withLive(List<PriceRow> live) {
+    if (live.isEmpty) return this;
+    return PriceData(
+      latest: Latest(
+        updatedAt: latest.updatedAt,
+        rows: mergeLive(latest.rows, live),
+        summary: latest.summary,
+        sample: latest.sample,
+      ),
+      markets: markets,
+      varieties: varieties,
+      sources: {...sources, MandiLive.sourceId: MandiLive.source},
+      offline: offline,
+      fetchedAt: fetchedAt,
+    );
+  }
 }
 
 /// Reads the static JSON published on GitHub Pages. Never reads prices from Firestore.
@@ -78,6 +97,9 @@ class PriceRepository {
       return null;
     }
   }
+
+  /// Live mandi rows read on the phone from data.gov.in ([] when unreachable).
+  Future<List<PriceRow>> liveMandi(PriceData d) => MandiLive(http).fetch(d.markets, d.varieties);
 
   Future<History> history(String crop, String marketId) async {
     try {

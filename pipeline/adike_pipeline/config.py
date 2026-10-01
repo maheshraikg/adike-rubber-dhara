@@ -16,7 +16,11 @@ AI_MAX_RETRIES = 3
 AI_BACKOFF_SECONDS = 8.0
 
 # --- data.gov.in ---------------------------------------------------------
-DATAGOV_BASE = "https://api.data.gov.in/resource/"
+# data.gov.in refuses GitHub's servers; when the Cloudflare relay (relay/) is set
+# up, requests go through it (DATAGOV_RELAY_URL + token header DATAGOV_RELAY_TOKEN).
+DATAGOV_RELAY_URL = os.environ.get("DATAGOV_RELAY_URL", "").strip().rstrip("/")
+DATAGOV_RELAY_TOKEN = os.environ.get("DATAGOV_RELAY_TOKEN", "").strip()
+DATAGOV_BASE = (DATAGOV_RELAY_URL or "https://api.data.gov.in") + "/resource/"
 DATAGOV_DAILY_RESOURCE = os.environ.get(
     "DATAGOV_DAILY_RESOURCE", "9ef84268-d588-465a-a308-a864a43d0070")
 # Historical variety-wise resource used by tools/backfill.py (verify with tools/probe_sources.py).
@@ -29,6 +33,12 @@ DATAGOV_QUERIES = [
 ]
 DATAGOV_PAGE_LIMIT = 1000
 DATAGOV_MAX_PAGES = 5
+# Public sample key that data.gov.in itself shows on every resource page, for use
+# without registering. It returns at most 10 records per request, so it is paged
+# in steps of 10. A personal key (DATA_GOV_IN_KEY secret) is used when set.
+DATAGOV_SAMPLE_KEY = "579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b"
+DATAGOV_SAMPLE_PAGE_LIMIT = 10
+DATAGOV_SAMPLE_MAX_PAGES = 20
 
 # --- fetching ------------------------------------------------------------
 MAX_REQUESTS_PER_SOURCE = 3
