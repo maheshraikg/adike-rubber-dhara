@@ -524,4 +524,11 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get shareText => 'ಇಂದಿನ ಅಡಿಕೆ–ರಬ್ಬರ್ ಧಾರಣೆ — ಅಡಿಕೆ–ರಬ್ಬರ್ ಧಾರಣೆ ಆ್ಯಪ್';
+
+  @override
+  String get photoCredits => 'ಚಿತ್ರ ಕೃಪೆ';
+
+  @override
+  String get photoCreditsHint =>
+      'ವಿಕಿಮೀಡಿಯಾ ಕಾಮನ್ಸ್‌ನ ನೈಜ ಚಿತ್ರಗಳು, ಉಚಿತ ಪರವಾನಗಿಯಡಿ ಬಳಸಲಾಗಿದೆ. ಮೂಲ ನೋಡಲು ಚಿತ್ರವನ್ನು ಒತ್ತಿ.';
 }

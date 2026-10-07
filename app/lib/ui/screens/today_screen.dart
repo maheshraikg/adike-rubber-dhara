@@ -17,50 +17,80 @@ class CropToggle extends StatelessWidget {
   final ValueChanged<String> onChanged;
   const CropToggle({super.key, required this.crop, required this.onChanged});
 
+  /// Real photos (Wikimedia Commons, credited in More › Photo credits).
+  static const photos = {'arecanut': 'assets/images/arecanut_hero.jpg', 'rubber': 'assets/images/rubber_hero.jpg'};
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    Widget option(String value, String label, IconData icon) {
+    Widget option(String value, String label) {
       final sel = crop == value;
       return Expanded(
         child: Semantics(
           selected: sel,
           button: true,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(14),
+          label: label,
+          child: GestureDetector(
             onTap: () => onChanged(value),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              duration: const Duration(milliseconds: 200),
+              height: 92,
               decoration: BoxDecoration(
-                color: sel ? scheme.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: sel ? scheme.primary : Colors.transparent, width: 3),
+                boxShadow: sel
+                    ? [BoxShadow(color: scheme.primary.withValues(alpha: 0.30), blurRadius: 10, offset: const Offset(0, 4))]
+                    : const [],
               ),
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(icon, size: 20, color: sel ? scheme.onPrimary : scheme.onSurfaceVariant),
-                const SizedBox(width: 8),
-                Text(label,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: sel ? scheme.onPrimary : scheme.onSurfaceVariant)),
-              ]),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Stack(fit: StackFit.expand, children: [
+                  Image.asset(photos[value]!, fit: BoxFit.cover, cacheWidth: 600,
+                      errorBuilder: (_, _, _) => ColoredBox(color: scheme.primaryContainer)),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: sel ? 0.05 : 0.35),
+                          Colors.black.withValues(alpha: sel ? 0.65 : 0.75),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 12,
+                    right: 8,
+                    bottom: 8,
+                    child: Row(children: [
+                      Expanded(
+                        child: Text(label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 19,
+                                fontWeight: FontWeight.w800,
+                                shadows: [Shadow(blurRadius: 6, color: Colors.black54)])),
+                      ),
+                      if (sel) const Icon(Icons.check_circle, color: Colors.white, size: 22),
+                    ]),
+                  ),
+                ]),
+              ),
             ),
           ),
         ),
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(color: scheme.surfaceContainerHigh, borderRadius: BorderRadius.circular(18)),
-      child: Row(children: [
-        option('arecanut', t.cropArecanut, Icons.eco),
-        const SizedBox(width: 4),
-        option('rubber', t.cropRubber, Icons.water_drop),
-      ]),
-    );
+    return Row(children: [
+      option('arecanut', t.cropArecanut),
+      const SizedBox(width: 10),
+      option('rubber', t.cropRubber),
+    ]);
   }
 }
 
