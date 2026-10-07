@@ -4,6 +4,9 @@ name: Adike – fetch image candidates
 
 on:
   workflow_dispatch:
+  push:
+    branches: [design-photos]
+    paths: [tools/fetch_commons_images.py, .github/workflows/adike-images.yml]
 
 permissions:
   contents: write
