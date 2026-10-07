@@ -27,22 +27,25 @@ class _Welcome extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
+      height: 150,
       margin: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(colors: [scheme.primary, const Color(0xFF1B5E20)]),
-      ),
-      child: Row(children: [
-        Container(
-          width: 52,
-          height: 52,
-          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), shape: BoxShape.circle),
-          child: const Icon(Icons.eco, color: Colors.white, size: 30),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: scheme.primary),
+      child: Stack(fit: StackFit.expand, children: [
+        Image.asset('assets/images/arecanut_bunch.jpg', fit: BoxFit.cover, cacheWidth: 900,
+            errorBuilder: (_, _, _) => const SizedBox()),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x14000000), Color(0xCC0B2E13)],
+            ),
+          ),
         ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(t.appTitle,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
             const SizedBox(height: 2),

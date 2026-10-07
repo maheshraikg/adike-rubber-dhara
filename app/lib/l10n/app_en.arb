@@ -237,5 +237,7 @@
   "aliasesJson": "Alias maps (JSON)",
   "savedOk": "Saved",
   "invalidJson": "Invalid JSON",
-  "shareText": "Today's arecanut & rubber rates — Adike Rubber Rates app"
+  "shareText": "Today's arecanut & rubber rates — Adike Rubber Rates app",
+  "photoCredits": "Photo credits",
+  "photoCreditsHint": "Real photos from Wikimedia Commons, used under their free licences. Tap a photo to see its source."
 }

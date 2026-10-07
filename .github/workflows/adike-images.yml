@@ -1,0 +1,30 @@
+# Downloads candidate photos (free licences) from Wikimedia Commons into the
+# images-candidates branch for review. Manual only.
+name: Adike – fetch image candidates
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [design-photos]
+    paths: [tools/fetch_commons_images.py, .github/workflows/adike-images.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - run: python tools/fetch_commons_images.py
+      - name: Push to images-candidates branch
+        run: |
+          git checkout -B images-candidates
+          git add images/candidates
+          git -c user.name="adike-bot" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Image candidates from Wikimedia Commons"
+          git push -f origin images-candidates

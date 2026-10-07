@@ -4,6 +4,7 @@ import '../../l10n/gen/app_localizations.dart';
 import '../admin/admin_screen.dart';
 import 'alerts_screen.dart';
 import 'partner_screen.dart';
+import 'photo_credits_screen.dart';
 import 'settings_screen.dart';
 import 'share_card_screen.dart';
 import 'weather_screen.dart';
@@ -41,7 +42,11 @@ class MoreScreen extends StatelessWidget {
           ]),
         ),
         Card(
-          child: tile(Icons.settings_outlined, const Color(0xFF546E7A), t.settingsTitle, t.dataSources, const SettingsScreen()),
+          child: Column(children: [
+            tile(Icons.settings_outlined, const Color(0xFF546E7A), t.settingsTitle, t.dataSources, const SettingsScreen()),
+            const Divider(indent: 72),
+            tile(Icons.photo_library_outlined, const Color(0xFF6D4C41), t.photoCredits, null, const PhotoCreditsScreen()),
+          ]),
         ),
         Card(
           child: Column(children: [

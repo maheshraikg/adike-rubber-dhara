@@ -528,4 +528,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get shareText =>
       'Today\'s arecanut & rubber rates — Adike Rubber Rates app';
+
+  @override
+  String get photoCredits => 'Photo credits';
+
+  @override
+  String get photoCreditsHint =>
+      'Real photos from Wikimedia Commons, used under their free licences. Tap a photo to see its source.';
 }

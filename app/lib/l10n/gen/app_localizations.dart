@@ -1062,6 +1062,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Today\'s arecanut & rubber rates — Adike Rubber Rates app'**
   String get shareText;
+
+  /// No description provided for @photoCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo credits'**
+  String get photoCredits;
+
+  /// No description provided for @photoCreditsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Real photos from Wikimedia Commons, used under their free licences. Tap a photo to see its source.'**
+  String get photoCreditsHint;
 }
 
 class _AppLocalizationsDelegate
