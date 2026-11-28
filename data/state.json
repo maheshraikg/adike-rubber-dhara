@@ -1,1 +1,1 @@
-{"sources":{"datagov_mandi":{"runs":84,"okRuns":0,"onTime":0,"onTimeTotal":0,"agree":0,"agreeTotal":0,"failStreak":84},"rubberboard_daily":{"runs":80,"okRuns":50,"onTime":0,"onTimeTotal":0,"agree":0,"agreeTotal":0,"failStreak":0}}}
+{"sources":{"datagov_mandi":{"runs":85,"okRuns":0,"onTime":0,"onTimeTotal":0,"agree":0,"agreeTotal":0,"failStreak":85},"rubberboard_daily":{"runs":81,"okRuns":50,"onTime":0,"onTimeTotal":0,"agree":0,"agreeTotal":0,"failStreak":1}}}
